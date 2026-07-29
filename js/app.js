@@ -7,6 +7,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const loginError = document.getElementById('login-error');
   const btnLockApp = document.getElementById('btn-lock-app');
   const btnChangePass = document.getElementById('btn-change-pass');
+  const togglePwdBtn = document.getElementById('toggle-pwd-btn');
+  const pwdEyeIcon = document.getElementById('pwd-eye-icon');
 
   // UI Elements
   const navItems = document.querySelectorAll('.nav-item');
@@ -66,6 +68,15 @@ document.addEventListener('DOMContentLoaded', () => {
     localStorage.removeItem('shopee_aff_authenticated');
     loginPinInput.value = '';
     loginError.classList.add('hidden');
+  }
+
+  // Toggle Password Visibility
+  if (togglePwdBtn && loginPinInput) {
+    togglePwdBtn.addEventListener('click', () => {
+      const isPwd = loginPinInput.type === 'password';
+      loginPinInput.type = isPwd ? 'text' : 'password';
+      pwdEyeIcon.className = isPwd ? 'fa-regular fa-eye-slash' : 'fa-regular fa-eye';
+    });
   }
 
   // Handle Login Submit

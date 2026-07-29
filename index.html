@@ -25,10 +25,13 @@
       </div>
       <form id="login-form">
         <div class="form-group">
-          <label for="login-pin">Nhập Mật Khẩu Truy Cập:</label>
-          <div class="input-with-icon">
-            <i class="fa-solid fa-lock"></i>
+          <label for="login-pin">Mật Khẩu Truy Cập Hệ Thống:</label>
+          <div class="password-input-group">
+            <i class="fa-solid fa-lock input-icon"></i>
             <input type="password" id="login-pin" placeholder="••••••••" autocomplete="current-password" required>
+            <button type="button" id="toggle-pwd-btn" class="toggle-pwd-btn" title="Hiện/Ẩn Mật Khẩu">
+              <i class="fa-regular fa-eye" id="pwd-eye-icon"></i>
+            </button>
           </div>
           <small id="login-error" class="login-error-msg hidden"><i class="fa-solid fa-circle-exclamation"></i> Mật khẩu không chính xác!</small>
         </div>
