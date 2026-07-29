@@ -1,4 +1,4 @@
-[
+const PRODUCTS_DATA = [
   {
     "id": "sp01",
     "title": "Thức Ăn Cá Đĩa Hikari Tropical Discus Bio-Gold (Mát Gan, Nổi Màu Tự Nhiên)",
@@ -111,4 +111,4 @@
     "shopeeUrl": "https://shopee.vn/search?keyword=Thuoc%20Parakill%20Tri%20Nam%20Ca",
     "status": "active"
   }
-]
+];
