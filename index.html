@@ -79,6 +79,14 @@
           <i class="fa-solid fa-list-check"></i>
           <span>Chuyển Đổi Hàng Loạt</span>
         </a>
+        <a href="#post-template" class="nav-item" data-tab="template">
+          <i class="fa-solid fa-pen-to-square"></i>
+          <span>Mẫu Bài Đăng Social</span>
+        </a>
+        <a href="#history" class="nav-item" data-tab="history">
+          <i class="fa-solid fa-clock-rotate-left"></i>
+          <span>Lịch Sử Chuyển Đổi</span>
+        </a>
         <a href="#tracking-matrix" class="nav-item" data-tab="matrix">
           <i class="fa-solid fa-tags"></i>
           <span>Cấu Hình Sub-ID</span>
@@ -196,7 +204,7 @@
             <div class="result-layout">
               <div class="result-details">
                 <div class="result-group highlight-box">
-                  <label><i class="fa-solid fa-star text-warning"></i> Link Rút Gọn (Khuyên Dùng Đăng Bài):</label>
+                  <label><i class="fa-solid fa-star text-warning"></i> Link Rút Gọn (Bảo Mật Tên Miền Dashboard):</label>
                   <div class="copy-box">
                     <input type="text" id="res-short-link" readonly class="text-primary font-weight-bold">
                     <button class="btn btn-primary btn-copy" data-target="res-short-link"><i class="fa-regular fa-copy"></i> Copy Ngay</button>
@@ -288,7 +296,73 @@
         </div>
       </section>
 
-      <!-- TAB 3: SUB-ID MATRIX CONFIG -->
+      <!-- TAB 3: MẪU BÀI ĐĂNG SOCIAL TEMPLATES -->
+      <section id="tab-template" class="tab-pane">
+        <div class="card">
+          <div class="card-header">
+            <i class="fa-solid fa-pen-to-square"></i>
+            <h3>Tự Động Tạo Content Bài Đăng Săn Mã / Đăng Bài</h3>
+          </div>
+          <div class="card-body">
+            <div class="form-group">
+              <label for="tpl-select">Chọn Mẫu Bài Đăng Gợi Ý:</label>
+              <select id="tpl-select" class="form-select">
+                <option value="hot">🔥 Mẫu Săn Mã Giảm Giá Sốc (Hot Deals)</option>
+                <option value="flash">⚡ Mẫu Khung Giờ Flash Sale 0H</option>
+                <option value="review">⭐ Mẫu Đánh Giá / Review Sản Phẩm</option>
+                <option value="group">📢 Mẫu Đăng Nhóm / Fanpage Zalo & Facebook</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="tpl-link-input">Dán Link Rút Gọn Đã Tạo Vào Bài Đăng:</label>
+              <input type="url" id="tpl-link-input" placeholder="https://tinyurl.com/xyz (Tự động lấy link vừa tạo)">
+            </div>
+
+            <div class="form-group">
+              <label for="tpl-output">Bài Đăng Hoàn Chỉnh (Có thể chỉnh sửa thêm):</label>
+              <textarea id="tpl-output" rows="8"></textarea>
+            </div>
+
+            <button class="btn btn-primary btn-lg" id="btn-copy-template">
+              <i class="fa-regular fa-copy"></i> Sao Chép Bài Đăng Hoàn Chỉnh
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 4: LỊCH SỬ CHUYỂN ĐỔI (HISTORY) -->
+      <section id="tab-history" class="tab-pane">
+        <div class="card">
+          <div class="card-header">
+            <i class="fa-solid fa-clock-rotate-left"></i>
+            <h3>Lịch Sử Chuyển Đổi Link Gần ĐÂY</h3>
+            <button class="btn btn-sm btn-outline text-danger" id="btn-clear-history" style="margin-left: auto;">
+              <i class="fa-solid fa-trash-can"></i> Xóa Lịch Sử
+            </button>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table" id="history-table">
+                <thead>
+                  <tr>
+                    <th>Thời Gian</th>
+                    <th>Link Shopee Gốc</th>
+                    <th>Link Affiliate Rút Gọn</th>
+                    <th>Sub ID</th>
+                    <th>Hành Động</th>
+                  </tr>
+                </thead>
+                <tbody id="history-tbody">
+                  <!-- Dynamic Rows -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 5: SUB-ID MATRIX CONFIG -->
       <section id="tab-matrix" class="tab-pane">
         <div class="card">
           <div class="card-header">
@@ -345,7 +419,7 @@
         </div>
       </section>
 
-      <!-- TAB 4: CHROME EXTENSION -->
+      <!-- TAB 6: CHROME EXTENSION -->
       <section id="tab-chrome" class="tab-pane">
         <div class="card">
           <div class="card-header">
@@ -374,7 +448,7 @@
         </div>
       </section>
 
-      <!-- TAB 5: GOOGLE SHEETS SCRIPT -->
+      <!-- TAB 7: GOOGLE SHEETS SCRIPT -->
       <section id="tab-sheets" class="tab-pane">
         <div class="card">
           <div class="card-header">
@@ -412,7 +486,7 @@ function SHOPEE_AFF(shopeeUrl, sub1, sub2, sub3) {
         </div>
       </section>
 
-      <!-- TAB 6: TELEGRAM BOT -->
+      <!-- TAB 8: TELEGRAM BOT -->
       <section id="tab-telegram" class="tab-pane">
         <div class="card">
           <div class="card-header">

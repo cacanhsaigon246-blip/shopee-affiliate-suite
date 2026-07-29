@@ -44,6 +44,16 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnCopyAllShort = document.getElementById('btn-copy-all-short');
   const btnExportCsv = document.getElementById('btn-export-csv');
 
+  // Social Template Elements
+  const tplSelect = document.getElementById('tpl-select');
+  const tplLinkInput = document.getElementById('tpl-link-input');
+  const tplOutput = document.getElementById('tpl-output');
+  const btnCopyTemplate = document.getElementById('btn-copy-template');
+
+  // History Elements
+  const historyTbody = document.getElementById('history-tbody');
+  const btnClearHistory = document.getElementById('btn-clear-history');
+
   // --- MOBILE MENU TOGGLE LOGIC ---
   function openMobileMenu() {
     sidebarNav.classList.add('mobile-open');
@@ -196,6 +206,16 @@ document.addEventListener('DOMContentLoaded', () => {
           pageTitle.textContent = 'Chuyển Đổi Link Shopee Hàng Loạt';
           pageDesc.textContent = 'Xử lý hàng chục link Shopee cùng lúc, hỗ trợ xuất file Excel hoặc sao chép nhanh.';
           break;
+        case 'template':
+          pageTitle.textContent = 'Mẫu Bài Đăng Social Media';
+          pageDesc.textContent = 'Tự động tạo nội dung bài đăng Facebook/Zalo/Telegram có chèn link Affiliate.';
+          updateSocialTemplate();
+          break;
+        case 'history':
+          pageTitle.textContent = 'Lịch Sử Chuyển Đổi Link Gần Đây';
+          pageDesc.textContent = 'Danh sách tất cả các link bạn đã tạo gần đây trên trình duyệt.';
+          renderHistoryTable();
+          break;
         case 'matrix':
           pageTitle.textContent = 'Cấu Hình Tracking Sub-ID';
           pageDesc.textContent = 'Quy chuẩn hóa 5 thẻ Sub-ID để đo lường chính xác hiệu quả từng kênh bán hàng.';
@@ -265,6 +285,72 @@ document.addEventListener('DOMContentLoaded', () => {
     return longUrl; // Fallback to full link
   }
 
+  // Save to History Log
+  function saveToHistory(originUrl, shortUrl, fullAffLink, subIdStr) {
+    const history = JSON.parse(localStorage.getItem('shopee_aff_history_list') || '[]');
+    const now = new Date();
+    const timeStr = `${now.toLocaleDateString('vi-VN')} ${now.toLocaleTimeString('vi-VN', {hour: '2-digit', minute:'2-digit'})}`;
+    
+    history.unshift({
+      timestamp: timeStr,
+      originUrl: originUrl,
+      shortUrl: shortUrl,
+      fullAffLink: fullAffLink,
+      subIdStr: subIdStr || 'N/A'
+    });
+
+    // Keep up to 100 entries
+    if (history.length > 100) history.pop();
+
+    localStorage.setItem('shopee_aff_history_list', JSON.stringify(history));
+  }
+
+  // Render History Table
+  function renderHistoryTable() {
+    const history = JSON.parse(localStorage.getItem('shopee_aff_history_list') || '[]');
+    historyTbody.innerHTML = '';
+
+    if (history.length === 0) {
+      historyTbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 2rem;">Chưa có lịch sử chuyển đổi link nào.</td></tr>`;
+      return;
+    }
+
+    history.forEach(item => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td style="font-size: 0.8rem; color: var(--text-muted);">${item.timestamp}</td>
+        <td style="max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${item.originUrl}</td>
+        <td><a href="${item.shortUrl}" target="_blank" style="color: var(--primary); font-weight: bold;">${item.shortUrl}</a></td>
+        <td><code>${item.subIdStr}</code></td>
+        <td>
+          <button class="btn btn-sm btn-outline copy-row-btn" data-url="${item.shortUrl}">
+            <i class="fa-regular fa-copy"></i> Copy
+          </button>
+        </td>
+      `;
+      historyTbody.appendChild(tr);
+    });
+
+    // Attach copy handlers
+    historyTbody.querySelectorAll('.copy-row-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const url = btn.getAttribute('data-url');
+        navigator.clipboard.writeText(url);
+        showToast('Đã copy link!');
+      });
+    });
+  }
+
+  if (btnClearHistory) {
+    btnClearHistory.addEventListener('click', () => {
+      if (confirm('Bạn có chắc muốn xóa toàn bộ lịch sử tạo link không?')) {
+        localStorage.removeItem('shopee_aff_history_list');
+        renderHistoryTable();
+        showToast('Đã xóa lịch sử!');
+      }
+    });
+  }
+
   // Single Link Conversion Event
   btnConvertSingle.addEventListener('click', async () => {
     const rawUrl = singleInputUrl.value;
@@ -294,6 +380,10 @@ document.addEventListener('DOMContentLoaded', () => {
     resShortLink.value = shortLink;
     resEncodedOrigin.textContent = result.encodedOrigin;
 
+    // Save to history & template
+    saveToHistory(rawUrl, shortLink, result.fullAffLink, result.subIdStr);
+    tplLinkInput.value = shortLink;
+
     // Generate QR Code
     const qrApi = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(shortLink)}`;
     qrCodeImg.src = qrApi;
@@ -306,6 +396,40 @@ document.addEventListener('DOMContentLoaded', () => {
     btnConvertSingle.innerHTML = '<i class="fa-solid fa-bolt"></i> Chuyển Đổi & Rút Gọn Link';
     showToast('Tạo link Affiliate thành công!');
   });
+
+  // --- SOCIAL POST TEMPLATE LOGIC ---
+  function updateSocialTemplate() {
+    const link = tplLinkInput.value.trim() || 'https://tinyurl.com/sample-link';
+    const type = tplSelect.value;
+
+    let text = '';
+    switch (type) {
+      case 'hot':
+        text = `🔥 SĂN MÃ GIẢM GIÁ SỐC SHOPEE HÔM NAY 🔥\n\n📌 Sản phẩm hot bán chạy giá cực êm!\n👉 Link mua hàng chính hãng: ${link}\n\n⚡ Nhanh tay chốt đơn kẻo hết mã ngon nha cả nhà! ❤️`;
+        break;
+      case 'flash':
+        text = `⚡ KHUNG GIỜ FLASH SALE 0H - XẢ HÀNG GIÁ SỐC ⚡\n\n🛍️ Sản phẩm giảm tới 50% hôm nay:\n👉 Nhấp mua ngay tại đây: ${link}\n\n🎁 Nhớ chèn thêm voucher Shopee Payday trong giỏ hàng nha!`;
+        break;
+      case 'review':
+        text = `⭐ REVIEW SẢN PHẨM DÙNG SIÊU THÍCH ⭐\n\nĐã trải nghiệm em này 2 tuần, chất lượng siêu ưng luôn mọi người ơi!\n👉 Mọi người ghé shop chuẩn tại đây nha: ${link}\n\nĐang có sale ngon lắm nè!`;
+        break;
+      case 'group':
+        text = `📢 KÈO SĂN MÃ NGON CHO ANH EM TRONG NHÓM 📢\n\nShop chính hãng đang xả kho deal hời lắm nè cả nhà:\n👉 Link chốt đơn: ${link}\n\nChúc anh em săn mã thành công! 🚀`;
+        break;
+    }
+    tplOutput.value = text;
+  }
+
+  if (tplSelect) tplSelect.addEventListener('change', updateSocialTemplate);
+  if (tplLinkInput) tplLinkInput.addEventListener('input', updateSocialTemplate);
+
+  if (btnCopyTemplate) {
+    btnCopyTemplate.addEventListener('click', () => {
+      if (!tplOutput.value.trim()) return;
+      navigator.clipboard.writeText(tplOutput.value);
+      showToast('Đã copy bài đăng hoàn chỉnh!');
+    });
+  }
 
   // Copy Buttons Event Listener
   document.querySelectorAll('.btn-copy').forEach(btn => {
@@ -367,6 +491,9 @@ document.addEventListener('DOMContentLoaded', () => {
         count++;
         const res = buildShopeeAffLink(line, affId, [sub1, sub2, `num${count}`]);
         const shortUrl = await shortenUrl(res.fullAffLink);
+
+        // Save to history
+        saveToHistory(line, shortUrl, res.fullAffLink, res.subIdStr);
 
         const item = {
           stt: count,
