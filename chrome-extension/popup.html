@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Shopee Affiliate 1-Click</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="header">
+    <div class="title">⚡ Shopee Affiliate 1-Click</div>
+  </div>
+
+  <div class="content">
+    <div class="form-group">
+      <label for="aff-id">Affiliate ID:</label>
+      <input type="text" id="aff-id" value="14354840000" placeholder="Mã ID Affiliate">
+    </div>
+
+    <div class="form-group">
+      <label for="current-url">Link Hiện Tại:</label>
+      <input type="text" id="current-url" readonly>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="sub1">Sub 1 (Nguồn):</label>
+        <input type="text" id="sub1" placeholder="facebook">
+      </div>
+      <div class="form-group">
+        <label for="sub2">Sub 2 (Dạng):</label>
+        <input type="text" id="sub2" placeholder="post">
+      </div>
+    </div>
+
+    <button id="btn-convert" class="btn-primary">Chuyển Đổi & Copy Link</button>
+
+    <div id="result-box" class="result-box hidden">
+      <label>Link Affiliate Rút Gọn:</label>
+      <input type="text" id="res-short-link" readonly>
+      <div class="status-msg">✅ Đã copy vào bộ nhớ tạm!</div>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
