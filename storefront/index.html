@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <title>Siêu Thị Cá Cảnh & Phụ Kiện Sài Gòn Cá Cảnh - Shopee Deals</title>
+  <!-- Google Fonts & Font Awesome Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="css/shop.css?v=1.0">
+</head>
+<body>
+
+  <!-- TOP PROMO BAR -->
+  <div class="top-promo-bar">
+    <i class="fa-solid fa-gift"></i> SĂN VOUCHER SHOPEE GIẢM 50% - TỰ ĐỘNG CẬP NHẬT DEAL MỖI NGÀY!
+  </div>
+
+  <!-- HEADER SHOWCASE -->
+  <header class="shop-header">
+    <div class="container header-container">
+      <a href="index.html" class="shop-brand">
+        <div class="shop-logo">
+          <i class="fa-solid fa-fish-fins"></i>
+        </div>
+        <div class="shop-brand-text">
+          <h1>SÀI GÒN CÁ CẢNH</h1>
+          <span>Supermarket Affiliate Store</span>
+        </div>
+      </a>
+
+      <!-- Search Bar -->
+      <div class="shop-search-bar">
+        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+        <input type="text" id="shop-search-input" placeholder="Tìm sản phẩm, thức ăn, máy bơm, vật liệu lọc...">
+        <button id="btn-clear-search" class="btn-clear hidden"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <!-- Wishlist / Cart Button -->
+      <button class="cart-btn" id="btn-open-cart">
+        <i class="fa-solid fa-bag-shopping"></i>
+        <span class="cart-count" id="cart-count">0</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- CATEGORY BANNER / SHELVES NAVIGATION -->
+  <div class="category-bar">
+    <div class="container category-container">
+      <button class="cat-pill active" data-cat="all">
+        <i class="fa-solid fa-border-all"></i> Tất Cả Kệ Hàng
+      </button>
+      <button class="cat-pill" data-cat="thuc-an">
+        <i class="fa-solid fa-bowl-food"></i> Thức Ăn Cá
+      </button>
+      <button class="cat-pill" data-cat="bom-loc">
+        <i class="fa-solid fa-filter"></i> Bơm & Lọc Nước
+      </button>
+      <button class="cat-pill" data-cat="den-led">
+        <i class="fa-solid fa-lightbulb"></i> Đèn Thủy Sinh
+      </button>
+      <button class="cat-pill" data-cat="thuoc-men">
+        <i class="fa-solid fa-vial"></i> Thuốc & Men Vi Sinh
+      </button>
+      <button class="cat-pill" data-cat="phu-kien">
+        <i class="fa-solid fa-cubes"></i> Phụ Kiện Bể Cá
+      </button>
+    </div>
+  </div>
+
+  <!-- MAIN SHOWCASE CONTENT -->
+  <main class="shop-main container">
+    
+    <!-- FALLBACK ALERT BANNER (Shows if redirected from broken link) -->
+    <div id="fallback-alert" class="fallback-alert hidden">
+      <i class="fa-solid fa-circle-info"></i>
+      <div class="fallback-text">
+        <strong>Sản phẩm bạn tìm kiếm đang được cập nhật hoặc vừa hết hàng!</strong>
+        <p>Hệ thống đã tự động lọc các sản phẩm cùng danh mục tốt nhất bên dưới để bạn lựa chọn dễ dàng.</p>
+      </div>
+      <button class="btn-close-alert" id="btn-close-alert"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+
+    <!-- PRODUCTS GRID SHOWCASE -->
+    <div class="section-title-box">
+      <h2 id="section-title">🔥 DẤU ẤN HOT - SẢN PHẨM BÁN CHẠY NHẤT</h2>
+      <span class="product-count-badge"><span id="product-count">0</span> Sản Phẩm Sẵn Có</span>
+    </div>
+
+    <div class="product-grid" id="product-grid">
+      <!-- Dynamic Products Cards Rendered Here -->
+    </div>
+
+    <!-- EMPTY SEARCH STATE -->
+    <div id="empty-state" class="empty-state hidden">
+      <i class="fa-solid fa-box-open"></i>
+      <h3>Không Tìm Thấy Sản Phẩm Phù Hợp!</h3>
+      <p>Hãy thử gõ từ khóa khác hoặc bấm chọn lại kệ hàng bên trên.</p>
+      <button class="btn btn-primary" id="btn-reset-filter"><i class="fa-solid fa-rotate-left"></i> Xem Tất Cả Sản Phẩm</button>
+    </div>
+
+  </main>
+
+  <!-- SHOPPING CART / WISHLIST DRAWER -->
+  <div id="cart-drawer-backdrop" class="cart-backdrop hidden"></div>
+  <aside id="cart-drawer" class="cart-drawer">
+    <div class="cart-header">
+      <h3><i class="fa-solid fa-bag-shopping"></i> Giỏ Hàng Mua Sắm Shopee</h3>
+      <button id="btn-close-cart" class="btn-close-cart"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="cart-body" id="cart-items-container">
+      <!-- Cart Items -->
+    </div>
+    <div class="cart-footer">
+      <div class="cart-total-box">
+        <span>Tổng sản phẩm đã chọn:</span>
+        <strong id="cart-total-count">0 món</strong>
+      </div>
+      <button class="btn btn-primary btn-lg" id="btn-checkout-shopee">
+        <i class="fa-solid fa-bolt"></i> ĐẾN SHOPEE MUA TẤT CẢ (NHẬN MÃ)
+      </button>
+    </div>
+  </aside>
+
+  <!-- FOOTER -->
+  <footer class="shop-footer">
+    <div class="container">
+      <p>© 2026 Sài Gòn Cá Cảnh - Shopee Affiliate Supermarket Showcase System.</p>
+      <small>Mọi sản phẩm được liên kết trực tiếp với Shopee Việt Nam. Đảm bảo chính hãng & nhận voucher giảm giá.</small>
+    </div>
+  </footer>
+
+  <!-- TOAST -->
+  <div id="shop-toast" class="toast hidden">
+    <i class="fa-solid fa-circle-check"></i>
+    <span id="shop-toast-msg">Đã thêm vào giỏ hàng!</span>
+  </div>
+
+  <script src="js/products-data.js"></script>
+  <script src="js/shop.js"></script>
+</body>
+</html>
