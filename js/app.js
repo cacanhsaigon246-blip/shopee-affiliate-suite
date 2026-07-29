@@ -1,5 +1,14 @@
 document.addEventListener('DOMContentLoaded', () => {
-  // Elements
+  // Authentication Elements
+  const loginLockOverlay = document.getElementById('login-lock-overlay');
+  const appMainContent = document.getElementById('app-main-content');
+  const loginForm = document.getElementById('login-form');
+  const loginPinInput = document.getElementById('login-pin');
+  const loginError = document.getElementById('login-error');
+  const btnLockApp = document.getElementById('btn-lock-app');
+  const btnChangePass = document.getElementById('btn-change-pass');
+
+  // UI Elements
   const navItems = document.querySelectorAll('.nav-item');
   const tabPanes = document.querySelectorAll('.tab-pane');
   const pageTitle = document.getElementById('page-title');
@@ -26,6 +35,86 @@ document.addEventListener('DOMContentLoaded', () => {
   const bulkTableBody = document.querySelector('#bulk-table tbody');
   const btnCopyAllShort = document.getElementById('btn-copy-all-short');
   const btnExportCsv = document.getElementById('btn-export-csv');
+
+  // --- AUTHENTICATION & LOGIN LOCK LOGIC ---
+  const DEFAULT_PIN = "041188";
+
+  function getStoredPin() {
+    return localStorage.getItem('shopee_aff_user_pin') || DEFAULT_PIN;
+  }
+
+  function checkAuthSession() {
+    const isAuth = localStorage.getItem('shopee_aff_authenticated');
+    if (isAuth === 'true') {
+      unlockAppUI();
+    } else {
+      lockAppUI();
+    }
+  }
+
+  function unlockAppUI() {
+    loginLockOverlay.classList.add('hidden');
+    appMainContent.classList.remove('blur-content');
+    appMainContent.classList.add('unlocked');
+    localStorage.setItem('shopee_aff_authenticated', 'true');
+  }
+
+  function lockAppUI() {
+    loginLockOverlay.classList.remove('hidden');
+    appMainContent.classList.add('blur-content');
+    appMainContent.classList.remove('unlocked');
+    localStorage.removeItem('shopee_aff_authenticated');
+    loginPinInput.value = '';
+    loginError.classList.add('hidden');
+  }
+
+  // Handle Login Submit
+  loginForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const inputPin = loginPinInput.value.trim();
+    const currentPin = getStoredPin();
+
+    if (inputPin === currentPin) {
+      unlockAppUI();
+      showToast('Đăng nhập hệ thống thành công!');
+    } else {
+      loginError.classList.remove('hidden');
+      loginPinInput.focus();
+      loginPinInput.select();
+    }
+  });
+
+  // Lock System Button
+  if (btnLockApp) {
+    btnLockApp.addEventListener('click', () => {
+      lockAppUI();
+      showToast('Đã khóa hệ thống!');
+    });
+  }
+
+  // Change Password Button
+  if (btnChangePass) {
+    btnChangePass.addEventListener('click', () => {
+      const currentPin = getStoredPin();
+      const oldPin = prompt("Nhập mật khẩu hiện tại:");
+      if (oldPin === null) return;
+      if (oldPin !== currentPin) {
+        alert("Mật khẩu hiện tại không đúng!");
+        return;
+      }
+      const newPin = prompt("Nhập mật khẩu mới mong muốn:");
+      if (newPin && newPin.trim().length >= 4) {
+        localStorage.setItem('shopee_aff_user_pin', newPin.trim());
+        alert("Đổi mật khẩu thành công! Hãy ghi nhớ mật khẩu mới của bạn.");
+        showToast("Đã cập nhật mật khẩu mới!");
+      } else if (newPin !== null) {
+        alert("Mật khẩu mới phải có tối thiểu 4 ký tự!");
+      }
+    });
+  }
+
+  // Check auth session on page load
+  checkAuthSession();
 
   // Load Saved Affiliate ID
   const savedAffId = localStorage.getItem('shopee_aff_id');

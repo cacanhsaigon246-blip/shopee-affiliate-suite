@@ -36,6 +36,7 @@ Create-FtpDir "$baseRemote/css"
 Create-FtpDir "$baseRemote/js"
 
 # 2. Upload Web Dashboard core files
+Upload-File "$localDir\.htaccess" "$baseRemote/.htaccess"
 Upload-File "$localDir\index.html" "$baseRemote/index.html"
 Upload-File "$localDir\css\style.css" "$baseRemote/css/style.css"
 Upload-File "$localDir\js\app.js" "$baseRemote/js/app.js"

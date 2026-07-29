@@ -12,7 +12,38 @@
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <div class="app-container">
+
+  <!-- LOGIN LOCK SCREEN OVERLAY -->
+  <div id="login-lock-overlay" class="login-overlay">
+    <div class="login-card">
+      <div class="login-header">
+        <div class="login-brand-icon">
+          <i class="fa-solid fa-shield-halved"></i>
+        </div>
+        <h2>BẢO MẬT HỆ THỐNG</h2>
+        <p>Shopee Affiliate Optimization Suite</p>
+      </div>
+      <form id="login-form">
+        <div class="form-group">
+          <label for="login-pin">Nhập Mật Khẩu Truy Cập:</label>
+          <div class="input-with-icon">
+            <i class="fa-solid fa-lock"></i>
+            <input type="password" id="login-pin" placeholder="••••••••" autocomplete="current-password" required>
+          </div>
+          <small id="login-error" class="login-error-msg hidden"><i class="fa-solid fa-circle-exclamation"></i> Mật khẩu không chính xác!</small>
+        </div>
+        <button type="submit" class="btn btn-primary btn-lg">
+          <i class="fa-solid fa-key"></i> ĐĂNG NHẬP HỆ THỐNG
+        </button>
+      </form>
+      <div class="login-footer">
+        <small><i class="fa-solid fa-user-shield"></i> Phiên đăng nhập được lưu tự động trên thiết bị này</small>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN APP CONTAINER -->
+  <div class="app-container blur-content" id="app-main-content">
     <!-- Sidebar Navigation -->
     <aside class="sidebar">
       <div class="brand">
@@ -63,6 +94,10 @@
             <input type="text" id="global-aff-id" placeholder="Ví dụ: 14354840000" value="14354840000">
           </div>
         </div>
+
+        <button class="btn btn-outline btn-lock-system" id="btn-lock-app">
+          <i class="fa-solid fa-lock"></i> Khóa Hệ Thống
+        </button>
       </div>
     </aside>
 
@@ -75,8 +110,8 @@
           <p id="page-desc">Chuyển đổi link Shopee nhanh chóng với UTM Tracking chuẩn xác và mã hóa an toàn.</p>
         </div>
         <div class="header-actions">
-          <button class="btn btn-outline" id="btn-quick-settings">
-            <i class="fa-solid fa-sliders"></i> Tùy chọn
+          <button class="btn btn-outline" id="btn-change-pass">
+            <i class="fa-solid fa-key"></i> Đổi Mật Khẩu
           </button>
         </div>
       </header>

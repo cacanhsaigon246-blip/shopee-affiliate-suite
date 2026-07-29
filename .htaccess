@@ -1,0 +1,7 @@
+# Force HTTPS & Redirect Subfolder to Subdomain aff.saigoncacanh.com
+RewriteEngine On
+
+# Redirect if accessed via saigoncacanh.com/aff/
+RewriteCond %{HTTP_HOST} ^saigoncacanh\.com$ [NC]
+RewriteCond %{REQUEST_URI} ^/aff/(.*)$ [NC]
+RewriteRule ^(.*)$ https://aff.saigoncacanh.com/$1 [R=301,L]
