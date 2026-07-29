@@ -2,8 +2,8 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Shopee Affiliate Optimization Suite - All-In-One Toolkit</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Shopee Affiliate Optimization Suite - Mobile & Desktop</title>
   <!-- Google Fonts & Font Awesome Icons -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,6 +12,17 @@
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+
+  <!-- MOBILE HEADER BAR -->
+  <div class="mobile-header-bar">
+    <div class="mobile-brand">
+      <div class="brand-icon-sm"><i class="fa-solid fa-bolt"></i></div>
+      <span>Shopee Aff PRO</span>
+    </div>
+    <button id="btn-toggle-mobile-menu" class="btn-mobile-toggle" aria-label="Mở menu">
+      <i class="fa-solid fa-bars" id="mobile-menu-icon"></i>
+    </button>
+  </div>
 
   <!-- LOGIN LOCK SCREEN OVERLAY -->
   <div id="login-lock-overlay" class="login-overlay">
@@ -48,7 +59,7 @@
   <!-- MAIN APP CONTAINER -->
   <div class="app-container blur-content" id="app-main-content">
     <!-- Sidebar Navigation -->
-    <aside class="sidebar">
+    <aside class="sidebar" id="sidebar-nav">
       <div class="brand">
         <div class="brand-icon">
           <i class="fa-solid fa-bolt"></i>
@@ -104,6 +115,9 @@
       </div>
     </aside>
 
+    <!-- Overlay backdrop for mobile menu -->
+    <div id="mobile-menu-backdrop" class="mobile-backdrop hidden"></div>
+
     <!-- Main Content Area -->
     <main class="main-content">
       <!-- Top Header -->
@@ -131,35 +145,35 @@
               <label for="single-input-url">Link Sản Phẩm / Shop Shopee Gốc <span class="required">*</span></label>
               <div class="input-with-icon">
                 <i class="fa-solid fa-link"></i>
-                <input type="url" id="single-input-url" placeholder="Dán link Shopee tại đây (ví dụ: https://shopee.vn/product/123/456...)">
+                <input type="url" id="single-input-url" placeholder="Dán link Shopee tại đây...">
               </div>
             </div>
 
             <!-- Sub ID Fields Breakdown -->
             <div class="subid-grid-header">
-              <h4>Gán Thẻ Theo Dõi Sub-ID (Tùy chọn - Tối đa 5 thẻ)</h4>
-              <span class="tooltip-info" title="Giúp phân loại nguồn traffic để đo lường tỷ lệ chuyển đổi"><i class="fa-solid fa-circle-info"></i> Giải thích Sub-ID</span>
+              <h4>Gán Thẻ Theo Dõi Sub-ID (Tối đa 5 thẻ)</h4>
+              <span class="tooltip-info" title="Giúp phân loại nguồn traffic"><i class="fa-solid fa-circle-info"></i> Giải thích</span>
             </div>
 
             <div class="subid-grid">
               <div class="subid-item">
-                <label for="sub1">Sub 1 (Nguồn Traffic)</label>
-                <input type="text" id="sub1" placeholder="facebook, tiktok, zalo...">
+                <label for="sub1">Sub 1 (Nguồn)</label>
+                <input type="text" id="sub1" placeholder="facebook, tiktok...">
               </div>
               <div class="subid-item">
-                <label for="sub2">Sub 2 (Định Dạng Bài)</label>
-                <input type="text" id="sub2" placeholder="reel, post, bio, story...">
+                <label for="sub2">Sub 2 (Định Dạng)</label>
+                <input type="text" id="sub2" placeholder="reel, post...">
               </div>
               <div class="subid-item">
                 <label for="sub3">Sub 3 (Chiến Dịch)</label>
-                <input type="text" id="sub3" placeholder="sale99, payday, 1111...">
+                <input type="text" id="sub3" placeholder="sale99, payday...">
               </div>
               <div class="subid-item">
-                <label for="sub4">Sub 4 (Mã SP/Vị Trí)</label>
-                <input type="text" id="sub4" placeholder="sp01, top1, banner...">
+                <label for="sub4">Sub 4 (Vị Trí/Mã SP)</label>
+                <input type="text" id="sub4" placeholder="sp01, top1...">
               </div>
               <div class="subid-item">
-                <label for="sub5">Sub 5 (Ghi Chú Thêm)</label>
+                <label for="sub5">Sub 5 (Ghi Chú)</label>
                 <input type="text" id="sub5" placeholder="custom_note...">
               </div>
             </div>
@@ -181,16 +195,8 @@
           <div class="card-body">
             <div class="result-layout">
               <div class="result-details">
-                <div class="result-group">
-                  <label>Link Affiliate Shopee Chuẩn (Gốc đầy đủ):</label>
-                  <div class="copy-box">
-                    <input type="text" id="res-full-link" readonly>
-                    <button class="btn btn-copy" data-target="res-full-link"><i class="fa-regular fa-copy"></i> Copy</button>
-                  </div>
-                </div>
-
                 <div class="result-group highlight-box">
-                  <label><i class="fa-solid fa-star text-warning"></i> Link Rút Gọn Rút Ngắn (Khuyên Dùng Đăng Bài):</label>
+                  <label><i class="fa-solid fa-star text-warning"></i> Link Rút Gọn (Khuyên Dùng Đăng Bài):</label>
                   <div class="copy-box">
                     <input type="text" id="res-short-link" readonly class="text-primary font-weight-bold">
                     <button class="btn btn-primary btn-copy" data-target="res-short-link"><i class="fa-regular fa-copy"></i> Copy Ngay</button>
@@ -198,7 +204,15 @@
                 </div>
 
                 <div class="result-group">
-                  <label>Link Đã Mã Hóa Origin (Để kiểm tra):</label>
+                  <label>Link Affiliate Shopee Gốc Đầy Đủ:</label>
+                  <div class="copy-box">
+                    <input type="text" id="res-full-link" readonly>
+                    <button class="btn btn-copy" data-target="res-full-link"><i class="fa-regular fa-copy"></i> Copy</button>
+                  </div>
+                </div>
+
+                <div class="result-group">
+                  <label>Link Mã Hóa Origin:</label>
                   <small id="res-encoded-origin" class="code-preview"></small>
                 </div>
               </div>
@@ -224,8 +238,8 @@
           </div>
           <div class="card-body">
             <div class="form-group">
-              <label for="bulk-input-text">Nhập Danh Sách Link Shopee Gốc (Mỗi link một dòng):</label>
-              <textarea id="bulk-input-text" rows="6" placeholder="https://shopee.vn/product/111/222&#10;https://shopee.vn/product/333/444&#10;https://shopee.vn/colgate.palmolive_vietnam"></textarea>
+              <label for="bulk-input-text">Nhập Danh Sách Link Shopee Gốc (Mỗi link 1 dòng):</label>
+              <textarea id="bulk-input-text" rows="5" placeholder="https://shopee.vn/product/111/222&#10;https://shopee.vn/product/333/444"></textarea>
             </div>
 
             <div class="form-row">
@@ -234,7 +248,7 @@
                 <input type="text" id="bulk-sub1" placeholder="facebook_group">
               </div>
               <div class="form-group col-6">
-                <label for="bulk-sub2">Gán Chiến Dịch Chung (Sub 2):</label>
+                <label for="bulk-sub2">Gán Chiến Dịch (Sub 2):</label>
                 <input type="text" id="bulk-sub2" placeholder="sale_payday">
               </div>
             </div>
@@ -249,7 +263,7 @@
                 <h4>Kết quả chuyển đổi (<span id="bulk-count">0</span> link)</h4>
                 <div class="btn-group">
                   <button class="btn btn-outline" id="btn-copy-all-short"><i class="fa-regular fa-copy"></i> Copy Tất Cả Link Ngắn</button>
-                  <button class="btn btn-success" id="btn-export-csv"><i class="fa-solid fa-file-excel"></i> Xuất File Excel / CSV</button>
+                  <button class="btn btn-success" id="btn-export-csv"><i class="fa-solid fa-file-excel"></i> Xuất Excel / CSV</button>
                 </div>
               </div>
 

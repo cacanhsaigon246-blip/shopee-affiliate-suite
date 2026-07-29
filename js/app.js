@@ -1,4 +1,10 @@
 document.addEventListener('DOMContentLoaded', () => {
+  // Mobile Navigation Elements
+  const btnToggleMobileMenu = document.getElementById('btn-toggle-mobile-menu');
+  const sidebarNav = document.getElementById('sidebar-nav');
+  const mobileMenuBackdrop = document.getElementById('mobile-menu-backdrop');
+  const mobileMenuIcon = document.getElementById('mobile-menu-icon');
+
   // Authentication Elements
   const loginLockOverlay = document.getElementById('login-lock-overlay');
   const appMainContent = document.getElementById('app-main-content');
@@ -37,6 +43,33 @@ document.addEventListener('DOMContentLoaded', () => {
   const bulkTableBody = document.querySelector('#bulk-table tbody');
   const btnCopyAllShort = document.getElementById('btn-copy-all-short');
   const btnExportCsv = document.getElementById('btn-export-csv');
+
+  // --- MOBILE MENU TOGGLE LOGIC ---
+  function openMobileMenu() {
+    sidebarNav.classList.add('mobile-open');
+    mobileMenuBackdrop.classList.remove('hidden');
+    mobileMenuIcon.className = 'fa-solid fa-xmark';
+  }
+
+  function closeMobileMenu() {
+    sidebarNav.classList.remove('mobile-open');
+    mobileMenuBackdrop.classList.add('hidden');
+    mobileMenuIcon.className = 'fa-solid fa-bars';
+  }
+
+  if (btnToggleMobileMenu) {
+    btnToggleMobileMenu.addEventListener('click', () => {
+      if (sidebarNav.classList.contains('mobile-open')) {
+        closeMobileMenu();
+      } else {
+        openMobileMenu();
+      }
+    });
+  }
+
+  if (mobileMenuBackdrop) {
+    mobileMenuBackdrop.addEventListener('click', closeMobileMenu);
+  }
 
   // --- AUTHENTICATION & LOGIN LOCK LOGIC ---
   const DEFAULT_PIN = "041188";
@@ -151,6 +184,8 @@ document.addEventListener('DOMContentLoaded', () => {
       const activePane = document.getElementById(`tab-${targetTab}`);
       if (activePane) activePane.classList.add('active');
 
+      closeMobileMenu(); // Close mobile drawer when selecting tab
+
       // Update Page Header Titles
       switch (targetTab) {
         case 'single':
@@ -236,12 +271,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const affId = globalAffIdInput.value.trim() || '14354840000';
 
     if (!rawUrl || (!rawUrl.includes('shopee.vn') && !rawUrl.includes('shope.ee'))) {
-      alert('Vui lòng nhập đường dẫn Shopee hợp lệ (ví dụ: https://shopee.vn/product/...)');
+      alert('Vui lòng nhập đường dẫn Shopee hợp lệ!');
       return;
     }
 
     btnConvertSingle.disabled = true;
-    btnConvertSingle.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang Mã Hóa & Rút Gọn...';
+    btnConvertSingle.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang Xử Lý...';
 
     const subIds = [
       document.getElementById('sub1').value,
@@ -260,7 +295,7 @@ document.addEventListener('DOMContentLoaded', () => {
     resEncodedOrigin.textContent = result.encodedOrigin;
 
     // Generate QR Code
-    const qrApi = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(shortLink)}`;
+    const qrApi = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(shortLink)}`;
     qrCodeImg.src = qrApi;
     downloadQrBtn.href = qrApi;
 
@@ -280,8 +315,15 @@ document.addEventListener('DOMContentLoaded', () => {
       if (inputEl) {
         inputEl.select();
         navigator.clipboard.writeText(inputEl.value);
-        showToast('Đã sao chép link vào bộ nhớ tạm!');
+        showToast('Đã sao chép link!');
       }
+    });
+  });
+
+  // Auto Select input text on tap for mobile convenience
+  document.querySelectorAll('input[readonly]').forEach(input => {
+    input.addEventListener('focus', () => {
+      input.select();
     });
   });
 
@@ -339,7 +381,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td>${count}</td>
-          <td style="max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${line}</td>
+          <td style="max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${line}</td>
           <td><a href="${shortUrl}" target="_blank" style="color: var(--primary); font-weight: bold;">${shortUrl}</a></td>
           <td><code>${res.subIdStr || 'N/A'}</code></td>
           <td>
@@ -366,7 +408,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     btnConvertBulk.disabled = false;
     btnConvertBulk.innerHTML = '<i class="fa-solid fa-layer-group"></i> Xử Lý Chuyển Đổi Hàng Loạt';
-    showToast(`Đã chuyển đổi thành công ${count} link!`);
+    showToast(`Đã chuyển đổi ${count} link!`);
   });
 
   // Copy All Short Links
