@@ -1,5 +1,19 @@
 const PRODUCTS_DATA = [
   {
+    "id": "sp-coll01",
+    "title": "🔥 Tủ Đồ & Bộ Sưu Tập Shopee KOC Cannabis_SG834 (Tất Cả Sản Phẩm Ưu Đãi)",
+    "category": "phu-kien",
+    "categoryName": "My Collection Shopee",
+    "price": "Giảm 50%",
+    "originalPrice": "Voucher Hot",
+    "discount": "MỚI",
+    "rating": "5.0",
+    "sold": "10k+",
+    "image": "https://images.unsplash.com/photo-1522069169874-c58ec4b76be5?w=500&auto=format&fit=crop&q=80",
+    "shopeeUrl": "https://collshp.com/cannabis_sg834?view=storefront",
+    "status": "active"
+  },
+  {
     "id": "sp01",
     "title": "Thức Ăn Cá Đĩa Hikari Tropical Discus Bio-Gold (Mát Gan, Nổi Màu Tự Nhiên)",
     "category": "thuc-an",
