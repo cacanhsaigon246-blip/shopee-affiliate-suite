@@ -45,5 +45,6 @@ Upload-FileToFtp "$localBase\css\shop.css" "$remoteBase/css/shop.css"
 Upload-FileToFtp "$localBase\js\products-data.js" "$remoteBase/js/products-data.js"
 Upload-FileToFtp "$localBase\js\shop.js" "$remoteBase/js/shop.js"
 Upload-FileToFtp "$localBase\save-products.php" "$remoteBase/save-products.php"
+Upload-FileToFtp "$localBase\shorten.php" "$remoteBase/shorten.php"
 
 Write-Host "=== FTP UPLOAD TO SHOP.SAIGONCACANH.COM COMPLETED SUCCESSFULLY ==="
