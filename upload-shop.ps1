@@ -38,6 +38,7 @@ function Upload-FileToFtp($localPath, $remotePath) {
 Ensure-FtpDirectory "$remoteBase"
 Ensure-FtpDirectory "$remoteBase/css"
 Ensure-FtpDirectory "$remoteBase/js"
+Ensure-FtpDirectory "$remoteBase/images"
 
 # Upload files
 Upload-FileToFtp "$localBase\index.html" "$remoteBase/index.html"

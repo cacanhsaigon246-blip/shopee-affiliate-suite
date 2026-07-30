@@ -82,6 +82,49 @@ if ($mode === 'replace' || count($existingProducts) === 0) {
     $finalProducts = array_values($urlMap);
 }
 
+// -------------------------------------------------------------
+// AUTOMATIC IMAGE DOWNLOADER & LOCAL HOSTING (Hostinger /images/)
+// -------------------------------------------------------------
+$imgDir = __DIR__ . "/images";
+if (!file_exists($imgDir)) {
+    @mkdir($imgDir, 0755, true);
+}
+
+$baseUrl = "https://shop.saigoncacanh.com/images";
+
+foreach ($finalProducts as &$prod) {
+    if (isset($prod['image']) && strpos($prod['image'], 'http') === 0 && strpos($prod['image'], $baseUrl) === false) {
+        $remoteImg = $prod['image'];
+        // Hash filename to avoid collisions
+        $fileHash = md5($prod['id'] . '_' . (isset($prod['shopeeUrl']) ? $prod['shopeeUrl'] : $prod['title']));
+        $localFileName = "img_" . $fileHash . ".jpg";
+        $localFilePath = $imgDir . "/" . $localFileName;
+
+        // Download image if not already cached locally
+        if (!file_exists($localFilePath) || filesize($localFilePath) === 0) {
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $remoteImg);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 5);
+            curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36');
+            $imgBytes = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            curl_close($ch);
+
+            if ($httpCode === 200 && $imgBytes && strlen($imgBytes) > 500) {
+                @file_put_contents($localFilePath, $imgBytes);
+            }
+        }
+
+        // If local file was saved successfully, point product.image to local URL
+        if (file_exists($localFilePath) && filesize($localFilePath) > 500) {
+            $prod['image'] = $baseUrl . "/" . $localFileName;
+        }
+    }
+}
+unset($prod); // break reference
+
 // Process and format javascript file content
 $jsContent = "const PRODUCTS_DATA = " . json_encode($finalProducts, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) . ";";
 
