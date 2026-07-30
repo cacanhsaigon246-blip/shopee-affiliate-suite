@@ -42,14 +42,14 @@
           <label for="login-pin">Mật Khẩu Truy Cập Hệ Thống:</label>
           <div class="password-input-group">
             <i class="fa-solid fa-lock input-icon"></i>
-            <input type="password" id="login-pin" placeholder="••••••••" autocomplete="current-password" required>
+            <input type="password" id="login-pin" placeholder="••••••••" autocomplete="off" required>
             <button type="button" id="toggle-pwd-btn" class="toggle-pwd-btn" title="Hiện/Ẩn Mật Khẩu">
               <i class="fa-regular fa-eye" id="pwd-eye-icon"></i>
             </button>
           </div>
           <small id="login-error" class="login-error-msg hidden"><i class="fa-solid fa-circle-exclamation"></i> Mật khẩu không chính xác!</small>
         </div>
-        <button type="submit" class="btn btn-primary btn-lg">
+        <button type="submit" id="btn-submit-login" class="btn btn-primary btn-lg">
           <i class="fa-solid fa-key"></i> ĐĂNG NHẬP HỆ THỐNG
         </button>
       </form>
@@ -537,6 +537,6 @@ if __name__ == '__main__':
     <span id="toast-msg">Đã sao chép vào bộ nhớ tạm!</span>
   </div>
 
-  <script src="js/app.js"></script>
+  <script src="js/app.js?v=2.6"></script>
 </body>
 </html>
