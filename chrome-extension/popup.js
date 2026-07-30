@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   btnConvert.addEventListener('click', async () => {
     const rawUrl = currentUrlInput.value;
-    const affId = affIdInput.value.trim() || '14354840000';
+      const affId = affIdInput.value.trim() || '17384730538';
 
     chrome.storage.local.set({ shopee_aff_id: affId });
 
@@ -73,7 +73,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
       }
 
-      const affId = affIdInput.value.trim() || '14354840000';
+        const affId = affIdInput.value.trim() || '17384730538';
       btnSyncPage.textContent = '⏳ Đang quét & đồng bộ...';
       btnSyncPage.disabled = true;
 

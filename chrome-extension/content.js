@@ -2,7 +2,7 @@
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === 'scrape_shopee_page') {
     const products = [];
-    const affId = request.affId || '14354840000';
+    const affId = request.affId || '17384730538';
 
     // Check if Single Product Page
     const ogTitle = document.querySelector('meta[property="og:title"]')?.content || document.title;

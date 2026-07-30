@@ -358,7 +358,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Single Link Conversion Event
   btnConvertSingle.addEventListener('click', async () => {
     const rawUrl = singleInputUrl.value;
-    const affId = globalAffIdInput.value.trim() || '14354840000';
+    const affId = globalAffIdInput.value.trim() || '17384730538';
 
     if (!rawUrl || (!rawUrl.includes('shopee.vn') && !rawUrl.includes('shope.ee'))) {
       alert('Vui lòng nhập đường dẫn Shopee hợp lệ!');
@@ -478,7 +478,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const lines = rawText.split('\n').filter(line => line.trim().length > 0);
-    const affId = globalAffIdInput.value.trim() || '14354840000';
+    const affId = globalAffIdInput.value.trim() || '17384730538';
     const sub1 = document.getElementById('bulk-sub1').value;
     const sub2 = document.getElementById('bulk-sub2').value;
 
