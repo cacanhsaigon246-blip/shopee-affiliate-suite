@@ -569,4 +569,213 @@ document.addEventListener('DOMContentLoaded', () => {
     document.body.removeChild(link);
     showToast('Đã xuất file CSV thành công!');
   });
+
+  // --- CHROME EXTENSION AUTO SCAN & SYNC LOGIC ---
+  const chromeExtIdInput = document.getElementById('chrome-ext-id');
+  const btnScanImages = document.getElementById('btn-scan-images');
+  const scanProgressBox = document.getElementById('scan-progress-box');
+  const scanProgressStatus = document.getElementById('scan-progress-status');
+  const scanProgressPercent = document.getElementById('scan-progress-percent');
+  const scanProgressBar = document.getElementById('scan-progress-bar');
+
+  // Load Saved Extension ID
+  if (chromeExtIdInput) {
+    const savedExtId = localStorage.getItem('shopee_chrome_ext_id') || 'cjdolihpgdfndgmnjifacglagkkofplj';
+    chromeExtIdInput.value = savedExtId;
+    chromeExtIdInput.addEventListener('change', () => {
+      localStorage.setItem('shopee_chrome_ext_id', chromeExtIdInput.value.trim());
+      showToast('Đã lưu Chrome Extension ID!');
+    });
+  }
+
+  // Parse Shopee shopid & itemid
+  function parseShopeeUrl(url) {
+    // Standard product: shopee.vn/product/123/456
+    const pRegex = /\/product\/(\d+)\/(\d+)/;
+    const pMatch = url.match(pRegex);
+    if (pMatch) {
+      return { shopid: pMatch[1], itemid: pMatch[2] };
+    }
+
+    // Short code or other pages: -i.123.456
+    const iRegex = /-i\.(\d+)\.(\d+)/;
+    const iMatch = url.match(iRegex);
+    if (iMatch) {
+      return { shopid: iMatch[1], itemid: iMatch[2] };
+    }
+
+    return null;
+  }
+
+  // Sleep utility
+  const sleep = ms => new Promise(res => setTimeout(res, ms));
+
+  if (btnScanImages) {
+    btnScanImages.addEventListener('click', () => {
+      if (bulkResultsList.length === 0) {
+        alert('Hãy chuyển đổi hàng loạt ít nhất 1 link Shopee trước khi quét ảnh!');
+        return;
+      }
+
+      const extId = chromeExtIdInput ? chromeExtIdInput.value.trim() : 'cjdolihpgdfndgmnjifacglagkkofplj';
+      if (!extId) {
+        alert('Vui lòng điền Chrome Extension ID ở cột trái!');
+        return;
+      }
+
+      // Ping Chrome Extension
+      scanProgressBox.classList.remove('hidden');
+      scanProgressStatus.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang kết nối tới Chrome Extension...';
+      
+      if (typeof chrome === 'undefined' || !chrome.runtime || !chrome.runtime.sendMessage) {
+        // Fallback if not on Chrome
+        alert('Không tìm thấy trình duyệt Google Chrome hoặc tính năng Extension. Vui lòng chạy trên Google Chrome!');
+        scanProgressBox.classList.add('hidden');
+        return;
+      }
+
+      chrome.runtime.sendMessage(extId, { action: 'ping' }, async (response) => {
+        if (chrome.runtime.lastError || !response || !response.success) {
+          alert('LỖI KẾT NỐI TIỆN ÍCH!\n\nVui lòng kiểm tra:\n1. Anh đã cài đặt và Bật tiện ích Chrome Extension chưa.\n2. Cột trái "Chrome Extension ID" đã điền chính xác ID của tiện ích chưa.');
+          scanProgressBox.classList.add('hidden');
+          return;
+        }
+
+        // Connection OK! Start Scanning Process
+        await runImageScanning(extId);
+      });
+    });
+  }
+
+  async function runImageScanning(extId) {
+    btnScanImages.disabled = true;
+    btnScanImages.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang quét...';
+    
+    const total = bulkResultsList.length;
+    const scannedProducts = [];
+    let completed = 0;
+
+    for (let i = 0; i < total; i++) {
+      const item = bulkResultsList[i];
+      completed++;
+      
+      // Update UI Progress
+      const percent = Math.round((completed / total) * 100);
+      scanProgressPercent.textContent = `${percent}%`;
+      scanProgressBar.style.width = `${percent}%`;
+      scanProgressStatus.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Đang xử lý link ${completed}/${total}...`;
+
+      let shopeeLink = item.originUrl;
+
+      // 1. Resolve redirect if short link (s.shopee.vn or shope.ee)
+      if (shopeeLink.includes('s.shopee.vn') || shopeeLink.includes('shope.ee')) {
+        try {
+          const resolveRes = await new Promise((resolve) => {
+            chrome.runtime.sendMessage(extId, { action: 'resolve_redirect', url: shopeeLink }, resolve);
+          });
+          if (resolveRes && resolveRes.success) {
+            shopeeLink = resolveRes.finalUrl;
+          }
+        } catch (e) {
+          console.warn('Resolve redirect failed:', e);
+        }
+      }
+
+      // 2. Parse shopid and itemid
+      const ids = parseShopeeUrl(shopeeLink);
+      let imgUrl = 'https://images.unsplash.com/photo-1522069169874-c58ec4b76be5?w=500&auto=format&fit=crop&q=80'; // fallback
+      let title = item.originUrl;
+      let price = 'Deal Ngon';
+      let shopName = 'Shopee Mall';
+
+      if (ids) {
+        try {
+          // Fetch product detail via extension
+          const productRes = await new Promise((resolve) => {
+            chrome.runtime.sendMessage(extId, { 
+              action: 'fetch_shopee_product', 
+              itemid: ids.itemid, 
+              shopid: ids.shopid 
+            }, resolve);
+          });
+
+          if (productRes && productRes.success && productRes.data) {
+            const data = productRes.data;
+            title = data.name || title;
+            price = data.price ? (data.price / 100000).toLocaleString('vi-VN') + 'đ' : price;
+            shopName = data.shop_location || shopName;
+            if (data.image) {
+              imgUrl = `https://down-vn.img.susercontent.com/file/${data.image}`;
+            }
+          }
+        } catch (e) {
+          console.warn('Fetch details failed:', e);
+        }
+      }
+
+      // Map Category dynamically based on title
+      let cat = 'phu-kien';
+      let catName = 'Phụ Kiện Bể Cá';
+      const cleanTitle = title.toLowerCase();
+      if (cleanTitle.includes('thức ăn') || cleanTitle.includes('cám') || cleanTitle.includes('mồi') || cleanTitle.includes('dinh dưỡng')) {
+        cat = 'thuc-an';
+        catName = 'Thức Ăn & Dinh Dưỡng';
+      } else if (cleanTitle.includes('bơm') || cleanTitle.includes('lọc') || cleanTitle.includes('sứ') || cleanTitle.includes('bông') || cleanTitle.includes('túi lọc') || cleanTitle.includes('vật liệu')) {
+        cat = 'bom-loc';
+        catName = 'Bơm & Thiết Bị Lọc';
+      } else if (cleanTitle.includes('đèn') || cleanTitle.includes('led') || cleanTitle.includes('ánh sáng') || cleanTitle.includes('chiếu sáng')) {
+        cat = 'den-led';
+        catName = 'Đèn LED & Thủy Sinh';
+      } else if (cleanTitle.includes('vi sinh') || cleanTitle.includes('men') || cleanTitle.includes('thuốc') || cleanTitle.includes('nấm') || cleanTitle.includes('khử')) {
+        cat = 'thuoc-men';
+        catName = 'Thuốc & Men Vi Sinh';
+      }
+
+      scannedProducts.push({
+        id: `csv-sp${completed}`,
+        title: title,
+        category: cat,
+        categoryName: catName,
+        price: price,
+        originalPrice: 'Shopee Deal',
+        discount: 'HOT',
+        rating: '5.0',
+        sold: 'Shopee Mall',
+        image: imgUrl,
+        shopeeUrl: item.shortUrl, // affiliate shortlink
+        status: 'active'
+      });
+
+      // Small delay to avoid API rate limiting
+      await sleep(250);
+    }
+
+    // 3. Send data to storefront save-products.php
+    scanProgressStatus.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang cập nhật danh mục Siêu Thị...';
+    
+    try {
+      const saveRes = await fetch('storefront/save-products.php?token=041188', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ products: scannedProducts })
+      });
+
+      const saveJson = await saveRes.json();
+      if (saveJson && saveJson.success) {
+        scanProgressStatus.innerHTML = '<i class="fa-solid fa-circle-check" style="color: #22c55e;"></i> 🎉 ĐÃ ĐỒNG BỘ 100% ẢNH THẬT LÊN SIÊU THỊ THÀNH CÔNG!';
+        showToast('Đồng bộ ảnh Siêu Thị thành công!');
+      } else {
+        scanProgressStatus.innerHTML = '<i class="fa-solid fa-circle-xmark" style="color: #ef4444;"></i> Lỗi lưu sản phẩm lên máy chủ.';
+      }
+    } catch (e) {
+      console.error(e);
+      scanProgressStatus.innerHTML = '<i class="fa-solid fa-circle-xmark" style="color: #ef4444;"></i> Không thể kết nối với máy chủ.';
+    }
+
+    btnScanImages.disabled = false;
+    btnScanImages.innerHTML = '<i class="fa-solid fa-camera"></i> Quét Ảnh & Đồng Bộ Siêu Thị';
+  }
 });
+

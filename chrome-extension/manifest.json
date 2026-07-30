@@ -1,15 +1,30 @@
 {
   "manifest_version": 3,
   "name": "Shopee Affiliate 1-Click Converter",
-  "version": "1.0.0",
-  "description": "Tạo & rút gọn link Shopee Affiliate ngay trên trang sản phẩm Shopee với 1 cú click.",
+  "version": "2.0.0",
+  "description": "Tạo & rút gọn link Shopee Affiliate ngay trên trang sản phẩm Shopee và quét thông tin tự động.",
   "permissions": [
     "activeTab",
     "clipboardWrite",
     "storage"
   ],
+  "host_permissions": [
+    "https://shopee.vn/*",
+    "https://*.shopee.vn/*",
+    "https://s.shopee.vn/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
   "action": {
     "default_popup": "popup.html",
     "default_title": "Shopee Affiliate Converter"
+  },
+  "externally_connectable": {
+    "matches": [
+      "http://aff.saigoncacanh.com/*",
+      "https://aff.saigoncacanh.com/*",
+      "http://localhost/*"
+    ]
   }
 }
