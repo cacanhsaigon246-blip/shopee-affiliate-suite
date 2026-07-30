@@ -13,6 +13,7 @@ $ch = curl_init();
 curl_setopt($ch, CURLOPT_URL, "https://ulvis.net/api.php?url=" . urlencode($url));
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+curl_setopt($ch, CURLOPT_TIMEOUT, 3);
 curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36");
 $result = curl_exec($ch);
 $http_status = curl_getinfo($ch, CURLINFO_HTTP_CODE);

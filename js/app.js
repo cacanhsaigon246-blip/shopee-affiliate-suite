@@ -276,18 +276,17 @@ document.addEventListener('DOMContentLoaded', () => {
     };
   }
 
-  // Shorten URL using our server proxy (No CORS issue, No Ads, Instant Redirect!)
-  async function shortenUrl(longUrl) {
+  // Shorten URL using our own branded domain redirect (Instant 0ms, No external API, 100% Reliable!)
+  function shortenUrl(longUrl) {
     try {
-      const response = await fetch(`http://shop.saigoncacanh.com/shorten.php?url=${encodeURIComponent(longUrl)}`);
-      if (response.ok) {
-        const shortUrl = await response.text();
-        return shortUrl.trim();
-      }
+      const b64 = btoa(unescape(encodeURIComponent(longUrl)))
+        .replace(/\+/g, '-')
+        .replace(/\//g, '_')
+        .replace(/=+$/, '');
+      return `https://shop.saigoncacanh.com/r.php?u=${b64}`;
     } catch (err) {
-      console.warn('is.gd proxy API error, returning full link:', err);
+      return longUrl;
     }
-    return longUrl; // Fallback to full link
   }
 
   // Save to History Log
@@ -490,57 +489,68 @@ document.addEventListener('DOMContentLoaded', () => {
     bulkResultsList = [];
 
     let count = 0;
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i].trim();
-      if (line.includes('shopee.vn') || line.includes('shope.ee')) {
-        count++;
-        const res = buildShopeeAffLink(line, affId, [sub1, sub2, `num${count}`]);
-        const shortUrl = await shortenUrl(res.fullAffLink);
 
-        // Save to history
-        saveToHistory(line, shortUrl, res.fullAffLink, res.subIdStr);
+    try {
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i].trim();
+        if (line.includes('shopee.vn') || line.includes('shope.ee')) {
+          count++;
+          const res = buildShopeeAffLink(line, affId, [sub1, sub2, `num${count}`]);
+          const shortUrl = shortenUrl(res.fullAffLink);
 
-        const item = {
-          stt: count,
-          originUrl: line,
-          fullAffLink: res.fullAffLink,
-          shortUrl: shortUrl,
-          subIdStr: res.subIdStr
-        };
-        bulkResultsList.push(item);
+          const item = {
+            stt: count,
+            originUrl: line,
+            fullAffLink: res.fullAffLink,
+            shortUrl: shortUrl,
+            subIdStr: res.subIdStr
+          };
+          bulkResultsList.push(item);
 
-        // Add Row to Table
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${count}</td>
-          <td style="max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${line}</td>
-          <td><a href="${shortUrl}" target="_blank" style="color: var(--primary); font-weight: bold;">${shortUrl}</a></td>
-          <td><code>${res.subIdStr || 'N/A'}</code></td>
-          <td>
-            <button class="btn btn-sm btn-outline copy-row-btn" data-url="${shortUrl}">
-              <i class="fa-regular fa-copy"></i> Copy
-            </button>
-          </td>
-        `;
-        bulkTableBody.appendChild(tr);
+          // Add Row to Table
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${count}</td>
+            <td style="max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${line}</td>
+            <td><a href="${shortUrl}" target="_blank" style="color: var(--primary); font-weight: bold;">${shortUrl}</a></td>
+            <td><code>${res.subIdStr || 'N/A'}</code></td>
+            <td>
+              <button class="btn btn-sm btn-outline copy-row-btn" data-url="${shortUrl}">
+                <i class="fa-regular fa-copy"></i> Copy
+              </button>
+            </td>
+          `;
+          bulkTableBody.appendChild(tr);
+        }
       }
-    }
 
-    bulkCount.textContent = count;
-    bulkResultsSection.classList.remove('hidden');
+      bulkCount.textContent = count;
+      bulkResultsSection.classList.remove('hidden');
 
-    // Attach copy handlers to row buttons
-    document.querySelectorAll('.copy-row-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const url = btn.getAttribute('data-url');
-        navigator.clipboard.writeText(url);
-        showToast('Đã copy link!');
+      // Save latest item to history & render history once
+      if (bulkResultsList.length > 0) {
+        const last = bulkResultsList[0];
+        saveToHistory(last.originUrl, last.shortUrl, last.fullAffLink, last.subIdStr);
+        renderHistoryTable();
+      }
+
+      // Attach copy handlers to row buttons
+      document.querySelectorAll('.copy-row-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const url = btn.getAttribute('data-url');
+          navigator.clipboard.writeText(url);
+          showToast('Đã copy link!');
+        });
       });
-    });
 
-    btnConvertBulk.disabled = false;
-    btnConvertBulk.innerHTML = '<i class="fa-solid fa-layer-group"></i> Xử Lý Chuyển Đổi Hàng Loạt';
-    showToast(`Đã chuyển đổi ${count} link!`);
+      showToast(`Đã chuyển đổi ${count} link!`);
+    } catch (err) {
+      console.error('Bulk convert error:', err);
+      alert('Có lỗi xảy ra trong quá trình chuyển đổi hàng loạt.');
+    } finally {
+      btnConvertBulk.disabled = false;
+      btnConvertBulk.innerHTML = '<i class="fa-solid fa-layer-group"></i> Xử Lý Chuyển Đổi Hàng Loạt';
+    }
   });
 
   // Copy All Short Links
@@ -602,6 +612,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const iMatch = url.match(iRegex);
     if (iMatch) {
       return { shopid: iMatch[1], itemid: iMatch[2] };
+    }
+
+    // Affiliate redirect (opaanlp): /opaanlp/123/456
+    const oRegex = /\/opaanlp\/(\d+)\/(\d+)/;
+    const oMatch = url.match(oRegex);
+    if (oMatch) {
+      return { shopid: oMatch[1], itemid: oMatch[2] };
     }
 
     return null;
@@ -704,8 +721,15 @@ document.addEventListener('DOMContentLoaded', () => {
             title = data.name || title;
             price = data.price ? (data.price / 100000).toLocaleString('vi-VN') + 'đ' : price;
             shopName = data.shop_location || shopName;
-            if (data.image) {
-              imgUrl = `https://down-vn.img.susercontent.com/file/${data.image}`;
+            
+            // Trích xuất chuẩn xác ảnh từ Shopee API (images[0], image, cover_image, image_url...)
+            const imgHash = (data.images && data.images.length > 0 ? data.images[0] : null) || data.image || data.cover_image || data.image_url || data.item_image;
+            if (imgHash) {
+              if (imgHash.startsWith('http')) {
+                imgUrl = imgHash;
+              } else {
+                imgUrl = `https://down-vn.img.susercontent.com/file/${imgHash}`;
+              }
             }
           }
         } catch (e) {
@@ -754,12 +778,12 @@ document.addEventListener('DOMContentLoaded', () => {
     scanProgressStatus.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang cập nhật danh mục Siêu Thị...';
     
     try {
-      const saveRes = await fetch('http://shop.saigoncacanh.com/save-products.php?token=041188', {
+      const formData = new FormData();
+      formData.append('payload', JSON.stringify({ products: scannedProducts }));
+
+      const saveRes = await fetch('https://shop.saigoncacanh.com/save-products.php?token=041188', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ products: scannedProducts })
+        body: formData
       });
 
       const saveJson = await saveRes.json();
@@ -767,7 +791,7 @@ document.addEventListener('DOMContentLoaded', () => {
         scanProgressStatus.innerHTML = '<i class="fa-solid fa-circle-check" style="color: #22c55e;"></i> 🎉 ĐÃ ĐỒNG BỘ 100% ẢNH THẬT LÊN SIÊU THỊ THÀNH CÔNG!';
         showToast('Đồng bộ ảnh Siêu Thị thành công!');
       } else {
-        scanProgressStatus.innerHTML = '<i class="fa-solid fa-circle-xmark" style="color: #ef4444;"></i> Lỗi lưu sản phẩm lên máy chủ.';
+        scanProgressStatus.innerHTML = '<i class="fa-solid fa-circle-xmark" style="color: #ef4444;"></i> Lỗi lưu sản phẩm lên máy chủ: ' + (saveJson.error || '');
       }
     } catch (e) {
       console.error(e);

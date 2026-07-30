@@ -21,19 +21,77 @@ if ($token !== '041188') {
 $input = file_get_contents("php://input");
 $data = json_decode($input, true);
 
-if (!$data || !isset($data['products']) || !is_array($data['products'])) {
+if (!$data && isset($_POST['payload'])) {
+    $data = json_decode($_POST['payload'], true);
+}
+if (!$data && isset($_POST['products'])) {
+    $data = ['products' => is_string($_POST['products']) ? json_decode($_POST['products'], true) : $_POST['products']];
+}
+
+if (!$data || !isset($data['products']) || !is_array($data['products']) || count($data['products']) === 0) {
     http_response_code(400);
-    echo json_encode(["success" => false, "error" => "Invalid product data payload"]);
+    echo json_encode([
+        "success" => false, 
+        "error" => "Invalid product data payload",
+        "raw_input" => substr($input, 0, 200),
+        "post_keys" => array_keys($_POST)
+    ]);
     exit;
 }
 
+// Read existing products if file exists
+$filePath = __DIR__ . "/js/products-data.js";
+$existingProducts = [];
+
+if (file_exists($filePath)) {
+    $existingContent = file_get_contents($filePath);
+    // Extract JSON array from "const PRODUCTS_DATA = [...];"
+    if (preg_match('/const\s+PRODUCTS_DATA\s*=\s*(\[[\s\S]*?\])\s*;?/', $existingContent, $matches)) {
+        $parsed = json_decode($matches[1], true);
+        if (is_array($parsed)) {
+            $existingProducts = $parsed;
+        }
+    }
+}
+
+$mode = isset($data['mode']) ? $data['mode'] : 'append'; // 'append' or 'replace'
+$finalProducts = [];
+
+if ($mode === 'replace' || count($existingProducts) === 0) {
+    $finalProducts = $data['products'];
+} else {
+    // Smart Merge: Keep existing products, update matching ones, append new ones
+    $urlMap = [];
+    foreach ($existingProducts as $idx => $p) {
+        $key = isset($p['shopeeUrl']) ? $p['shopeeUrl'] : (isset($p['title']) ? $p['title'] : $idx);
+        $urlMap[$key] = $p;
+    }
+
+    foreach ($data['products'] as $newP) {
+        $key = isset($newP['shopeeUrl']) ? $newP['shopeeUrl'] : (isset($newP['title']) ? $newP['title'] : null);
+        if ($key && isset($urlMap[$key])) {
+            // Update existing entry with new image/price/title
+            $urlMap[$key] = array_merge($urlMap[$key], array_filter($newP));
+        } else {
+            // New product entry
+            $newP['id'] = 'sp-' . (count($urlMap) + 1);
+            $urlMap['new_' . count($urlMap)] = $newP;
+        }
+    }
+
+    $finalProducts = array_values($urlMap);
+}
+
 // Process and format javascript file content
-$jsContent = "const PRODUCTS_DATA = " . json_encode($data['products'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) . ";";
+$jsContent = "const PRODUCTS_DATA = " . json_encode($finalProducts, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) . ";";
 
 // Write to products-data.js file in the same js/ directory
-$filePath = __DIR__ . "/js/products-data.js";
 if (file_put_contents($filePath, $jsContent) !== false) {
-    echo json_encode(["success" => true, "message" => "Successfully saved " . count($data['products']) . " products to storefront catalog!"]);
+    echo json_encode([
+        "success" => true, 
+        "message" => "Successfully synced " . count($finalProducts) . " total products (Mode: " . $mode . ") to storefront catalog!",
+        "total_count" => count($finalProducts)
+    ]);
 } else {
     http_response_code(500);
     echo json_encode(["success" => false, "error" => "Failed to write products-data.js file on server"]);

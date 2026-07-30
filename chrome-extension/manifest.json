@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Shopee Affiliate 1-Click Converter",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "Tạo & rút gọn link Shopee Affiliate ngay trên trang sản phẩm Shopee và quét thông tin tự động.",
   "permissions": [
     "activeTab",
