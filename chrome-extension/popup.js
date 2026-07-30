@@ -63,4 +63,50 @@ document.addEventListener('DOMContentLoaded', async () => {
     btnConvert.textContent = 'Chuyển Đổi & Copy Link';
     btnConvert.disabled = false;
   });
+
+  // Sync Current Shopee Page to Storefront (1-Click Real Image Sync!)
+  const btnSyncPage = document.getElementById('btn-sync-page');
+  if (btnSyncPage) {
+    btnSyncPage.addEventListener('click', async () => {
+      if (!tab || !tab.id || !tab.url || !tab.url.includes('shopee.vn')) {
+        alert('Vui lòng mở một trang sản phẩm hoặc trang tìm kiếm Shopee trước khi bấm đồng bộ!');
+        return;
+      }
+
+      const affId = affIdInput.value.trim() || '14354840000';
+      btnSyncPage.textContent = '⏳ Đang quét & đồng bộ...';
+      btnSyncPage.disabled = true;
+
+      try {
+        // Send message to content script to scrape page
+        chrome.tabs.sendMessage(tab.id, { action: 'scrape_shopee_page', affId }, async (response) => {
+          if (response && response.success && response.products && response.products.length > 0) {
+            // Send directly to save-products.php
+            const fd = new FormData();
+            fd.append('payload', JSON.stringify({ mode: 'append', products: response.products }));
+
+            const saveRes = await fetch('https://shop.saigoncacanh.com/save-products.php?token=041188', {
+              method: 'POST',
+              body: fd
+            });
+            const saveJson = await saveRes.json();
+
+            if (saveJson && saveJson.success) {
+              alert(`🎉 ĐÃ ĐỒNG BỘ THÀNH CÔNG ${response.products.length} SẢN PHẨM VỚI 100% ẢNH THẬT LÊN SHOP.SAIGONCACANH.COM!`);
+            } else {
+              alert('Có lỗi khi lưu lên máy chủ: ' + (saveJson ? saveJson.error : 'Lỗi mạng'));
+            }
+          } else {
+            alert('Không tìm thấy sản phẩm nào trên trang này. Hãy cuộn nhẹ trang web Shopee để ảnh tải xong rồi bấm lại nha anh!');
+          }
+          btnSyncPage.textContent = '📸 Đồng Bộ Trang Này Vào Siêu Thị';
+          btnSyncPage.disabled = false;
+        });
+      } catch (err) {
+        alert('Lỗi: Hãy tải lại trang Shopee rồi bấm lại nút này nhé!');
+        btnSyncPage.textContent = '📸 Đồng Bộ Trang Này Vào Siêu Thị';
+        btnSyncPage.disabled = false;
+      }
+    });
+  }
 });
