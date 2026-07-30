@@ -754,7 +754,7 @@ document.addEventListener('DOMContentLoaded', () => {
     scanProgressStatus.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang cập nhật danh mục Siêu Thị...';
     
     try {
-      const saveRes = await fetch('storefront/save-products.php?token=041188', {
+      const saveRes = await fetch('http://shop.saigoncacanh.com/save-products.php?token=041188', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
