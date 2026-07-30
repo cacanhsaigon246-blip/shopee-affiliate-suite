@@ -580,7 +580,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Load Saved Extension ID
   if (chromeExtIdInput) {
-    const savedExtId = localStorage.getItem('shopee_chrome_ext_id') || 'cjdolihpgdfndgmnjifacglagkkofplj';
+    const savedExtId = localStorage.getItem('shopee_chrome_ext_id') || 'giiidopldjffcbabkhepanbmmngolbni';
     chromeExtIdInput.value = savedExtId;
     chromeExtIdInput.addEventListener('change', () => {
       localStorage.setItem('shopee_chrome_ext_id', chromeExtIdInput.value.trim());
@@ -617,7 +617,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      const extId = chromeExtIdInput ? chromeExtIdInput.value.trim() : 'cjdolihpgdfndgmnjifacglagkkofplj';
+      const extId = chromeExtIdInput ? chromeExtIdInput.value.trim() : 'giiidopldjffcbabkhepanbmmngolbni';
       if (!extId) {
         alert('Vui lòng điền Chrome Extension ID ở cột trái!');
         return;
