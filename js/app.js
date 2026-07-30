@@ -177,8 +177,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Load Saved Affiliate ID
   const savedAffId = localStorage.getItem('shopee_aff_id');
-  if (savedAffId) {
+  if (savedAffId && savedAffId !== '14354840000') {
     globalAffIdInput.value = savedAffId;
+  } else {
+    globalAffIdInput.value = '17384730538';
+    localStorage.setItem('shopee_aff_id', '17384730538');
   }
 
   globalAffIdInput.addEventListener('change', () => {

@@ -9,8 +9,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Load saved affiliate ID
   chrome.storage.local.get(['shopee_aff_id'], (result) => {
-    if (result.shopee_aff_id) {
+    if (result.shopee_aff_id && result.shopee_aff_id !== '14354840000') {
       affIdInput.value = result.shopee_aff_id;
+    } else {
+      affIdInput.value = '17384730538';
+      chrome.storage.local.set({ shopee_aff_id: '17384730538' });
     }
   });
 
