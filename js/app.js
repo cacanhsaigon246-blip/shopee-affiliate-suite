@@ -276,16 +276,16 @@ document.addEventListener('DOMContentLoaded', () => {
     };
   }
 
-  // Shorten URL using TinyURL API with Fallback
+  // Shorten URL using is.gd API with Fallback (No Ads, Instant Redirect!)
   async function shortenUrl(longUrl) {
     try {
-      const response = await fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(longUrl)}`);
+      const response = await fetch(`https://is.gd/create.php?format=simple&url=${encodeURIComponent(longUrl)}`);
       if (response.ok) {
         const shortUrl = await response.text();
         return shortUrl.trim();
       }
     } catch (err) {
-      console.warn('TinyURL API rate limit or error, returning full link:', err);
+      console.warn('is.gd API error, returning full link:', err);
     }
     return longUrl; // Fallback to full link
   }
