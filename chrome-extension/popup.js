@@ -43,10 +43,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       fullLink += `&sub_id=${subIdStr}`;
     }
 
-    // Try shortening link with is.gd (No Ads, Instant Redirect!)
+    // Try shortening link with ulvis.net (No Ads, Instant Redirect!)
     let finalLink = fullLink;
     try {
-      const resp = await fetch(`https://is.gd/create.php?format=simple&url=${encodeURIComponent(fullLink)}`);
+      const resp = await fetch(`https://ulvis.net/api.php?url=${encodeURIComponent(fullLink)}`);
       if (resp.ok) {
         finalLink = (await resp.text()).trim();
       }
