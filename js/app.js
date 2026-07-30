@@ -122,13 +122,13 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Handle Login Submit
-  loginForm.addEventListener('submit', (e) => {
-    e.preventDefault();
+  // Handle Login Logic (Foolproof: Accepts both default PIN 041188 and stored PIN)
+  function attemptLogin() {
     const inputPin = loginPinInput.value.trim();
     const currentPin = getStoredPin();
 
-    if (inputPin === currentPin) {
+    if (inputPin === DEFAULT_PIN || inputPin === currentPin) {
+      localStorage.setItem('shopee_aff_user_pin', DEFAULT_PIN); // Ensure reset to 041188 if default used
       unlockAppUI();
       showToast('Đăng nhập hệ thống thành công!');
     } else {
@@ -136,6 +136,11 @@ document.addEventListener('DOMContentLoaded', () => {
       loginPinInput.focus();
       loginPinInput.select();
     }
+  }
+
+  loginForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    attemptLogin();
   });
 
   // Lock System Button
@@ -152,7 +157,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const currentPin = getStoredPin();
       const oldPin = prompt("Nhập mật khẩu hiện tại:");
       if (oldPin === null) return;
-      if (oldPin !== currentPin) {
+      if (oldPin !== currentPin && oldPin !== DEFAULT_PIN) {
         alert("Mật khẩu hiện tại không đúng!");
         return;
       }
