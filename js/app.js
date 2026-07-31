@@ -506,17 +506,25 @@ document.addEventListener('DOMContentLoaded', () => {
     modalSocialPost.classList.remove('hidden');
   }
 
+  function formatVietnamesePrice(priceStr) {
+    if (!priceStr) return 'Deal Ngon Shopee';
+    let clean = priceStr.replace('₫', '').replace('đ', '').replace('Giá', '').trim();
+    let num = parseFloat(clean);
+    if (!isNaN(num)) {
+      if (num < 1000 && num > 0) {
+        num = num * 10000;
+      }
+      return Math.round(num).toLocaleString('vi-VN') + 'đ';
+    }
+    return priceStr.endsWith('đ') ? priceStr : priceStr + 'đ';
+  }
+
   function generatePostScript() {
     if (!currentPostItem) return;
     const style = modalPostStyle.value;
     const title = currentPostItem.title;
-    let price = currentPostItem.price || 'Deal Ngon Shopee';
+    let price = formatVietnamesePrice(currentPostItem.price);
     const affId = globalAffIdInput.value.trim() || '17384730538';
-    
-    // Format price cleanly if it contains ₫4.83 or similar
-    if (price.startsWith('₫')) {
-      price = price.replace('₫', '').trim() + 'đ';
-    }
 
     let rawUrl = currentPostItem.shopeeUrl || '';
     let shortLink = '';
