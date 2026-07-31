@@ -6,14 +6,18 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     const seenTitles = new Set();
 
     // 1. Helper function to create clean affiliate URL (prevents double %25 encoding & strips extra tracking params)
-    function makeAffUrl(rawUrl) {
+    function makeAffUrl(rawUrl, title) {
       let cleanUrl = rawUrl || '';
       try { cleanUrl = decodeURIComponent(cleanUrl); } catch (e) {}
 
-      // Strip extra tracking query parameters
-      const qIdx = cleanUrl.indexOf('?');
-      if (qIdx > -1) {
-        cleanUrl = cleanUrl.substring(0, qIdx);
+      // If URL is an internal affiliate portal link, convert to public consumer Shopee search URL
+      if (cleanUrl.includes('affiliate.shopee.vn') || !cleanUrl.includes('shopee.vn')) {
+        cleanUrl = `https://shopee.vn/search?keyword=${encodeURIComponent((title || 'phu kien ca canh').trim())}`;
+      } else {
+        const qIdx = cleanUrl.indexOf('?');
+        if (qIdx > -1) {
+          cleanUrl = cleanUrl.substring(0, qIdx);
+        }
       }
 
       const encUrl = encodeURIComponent(cleanUrl);
@@ -85,7 +89,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
           rating: '5.0',
           sold: 'Shopee Mall',
           image: realImg,
-          shopeeUrl: makeAffUrl(currUrl),
+          shopeeUrl: makeAffUrl(currUrl, cleanTitle),
           status: 'active'
         });
         seenTitles.add(cleanTitle.toLowerCase());
@@ -97,7 +101,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       'li.shopee-search-item-result, div[data-sqe="item"], div.shopee-search-item-result__item, div.col-xs-2-4, div.shopee-item-card, div[class*="offer-item"], div[class*="product-item"], div[class*="ProductCard"], div[class*="offer-card"], div[class*="product-offer"]'
     );
 
-    // If querySelectorAll missed cards on affiliate.shopee.vn, fallback to images scan
     const allImages = (productCards.length > 0) ? [] : document.querySelectorAll('img[src*="susercontent"], img[src*="shopee"]');
 
     if (productCards.length > 0) {
@@ -112,7 +115,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
           const imgUrl = imgEl.src || imgEl.getAttribute('data-src') || '';
           let href = linkEl ? (linkEl.href || linkEl.getAttribute('href') || '') : '';
           
-          if (!href || !href.includes('shopee.vn')) {
+          if (!href || href.includes('affiliate.shopee.vn') || !href.includes('shopee.vn')) {
             href = `https://shopee.vn/search?keyword=${encodeURIComponent(title.trim())}`;
           } else if (href.startsWith('/')) {
             href = 'https://shopee.vn' + href;
@@ -139,14 +142,13 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
               rating: '5.0',
               sold: 'Shopee Mall',
               image: imgUrl,
-              shopeeUrl: makeAffUrl(href),
+              shopeeUrl: makeAffUrl(href, title.trim()),
               status: 'active'
             });
           }
         }
       });
     } else if (allImages.length > 0) {
-      // Fallback container scanner for affiliate.shopee.vn custom grids
       allImages.forEach((imgEl, idx) => {
         let parent = imgEl.parentElement;
         for (let i = 0; i < 4 && parent; i++) {
@@ -161,6 +163,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
           const priceText = matchPrice ? matchPrice[0] : 'Deal Ngon';
           const linkEl = parent.querySelector('a[href]');
           let href = linkEl ? linkEl.href : `https://shopee.vn/search?keyword=${encodeURIComponent(titleText.substring(0, 50))}`;
+
+          if (!href || href.includes('affiliate.shopee.vn')) {
+            href = `https://shopee.vn/search?keyword=${encodeURIComponent(titleText.substring(0, 50))}`;
+          }
 
           const cleanTKey = titleText.substring(0, 50).toLowerCase();
 
@@ -178,7 +184,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
               rating: '5.0',
               sold: 'Shopee Mall',
               image: imgUrl,
-              shopeeUrl: makeAffUrl(href),
+              shopeeUrl: makeAffUrl(href, titleText.substring(0, 50)),
               status: 'active'
             });
           }

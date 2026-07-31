@@ -55,16 +55,22 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 2800);
   }
 
-  // Build Affiliate Link (Prevents double wrapping if link is already an affiliate URL)
-  function getAffiliateLink(shopeeSearchOrUrl, productId) {
+  // Build Affiliate Link (Fixes internal affiliate portal links to public consumer Shopee search links)
+  function getAffiliateLink(shopeeSearchOrUrl, productId, title) {
     if (!shopeeSearchOrUrl) return '#';
     
-    // If link is already an affiliate short link (r.php, s.shopee.vn, shope.ee, ulvis.net), return directly
+    // Fix internal affiliate portal links if any exist in old database entries
+    if (shopeeSearchOrUrl.includes('affiliate.shopee.vn')) {
+      const cleanTitle = title || 'phu kien ca canh';
+      const searchUrl = `https://shopee.vn/search?keyword=${encodeURIComponent(cleanTitle.trim())}`;
+      const encoded = encodeURIComponent(searchUrl);
+      return `https://s.shopee.vn/an_redir?origin_link=${encoded}&affiliate_id=${AFFILIATE_ID}&sub_id=shop-supermarket-${productId}`;
+    }
+
     if (shopeeSearchOrUrl.includes('r.php') || shopeeSearchOrUrl.includes('s.shopee.vn') || shopeeSearchOrUrl.includes('shope.ee') || shopeeSearchOrUrl.includes('ulvis.net')) {
       return shopeeSearchOrUrl;
     }
 
-    // Clean URL to avoid double encoding (%25)
     let cleanUrl = shopeeSearchOrUrl;
     try { cleanUrl = decodeURIComponent(shopeeSearchOrUrl); } catch(e){}
     const questionIdx = cleanUrl.indexOf('?');
@@ -105,7 +111,7 @@ document.addEventListener('DOMContentLoaded', () => {
       productGrid.classList.remove('hidden');
 
       filtered.forEach(item => {
-        const affLink = getAffiliateLink(item.shopeeUrl, item.id);
+        const affLink = getAffiliateLink(item.shopeeUrl, item.id, item.title);
         const card = document.createElement('div');
         card.className = 'product-card';
         card.innerHTML = `
@@ -267,7 +273,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     wishlist.forEach(item => {
-      const affLink = getAffiliateLink(item.shopeeUrl, item.id);
+      const affLink = getAffiliateLink(item.shopeeUrl, item.id, item.title);
       window.open(affLink, '_blank');
     });
 
