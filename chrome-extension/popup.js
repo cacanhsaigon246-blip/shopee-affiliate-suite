@@ -54,7 +54,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         finalLink = (await resp.text()).trim();
       }
     } catch (e) {
-      console.warn('Shortener error:', e);
+      // Quiet fail fallback
     }
 
     resShortLink.value = finalLink;
@@ -105,10 +105,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
       }
 
-      // Try sending message to content script
+      // Quietly consume chrome.runtime.lastError to prevent red error badge in chrome://extensions
       chrome.tabs.sendMessage(tab.id, { action: 'scrape_shopee_page', affId }, async (response) => {
-        if (chrome.runtime.lastError || !response) {
-          console.warn('Content script not injected yet, injecting dynamically...', chrome.runtime.lastError);
+        const lastErr = chrome.runtime.lastError;
+        if (lastErr || !response) {
           // Dynamically inject content.js if missing
           try {
             await chrome.scripting.executeScript({
@@ -118,6 +118,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             // Retry message after injection
             chrome.tabs.sendMessage(tab.id, { action: 'scrape_shopee_page', affId }, async (retryRes) => {
+              const retryErr = chrome.runtime.lastError;
               if (retryRes && retryRes.success && retryRes.products && retryRes.products.length > 0) {
                 await sendDataToStorefront(retryRes.products);
               } else {
