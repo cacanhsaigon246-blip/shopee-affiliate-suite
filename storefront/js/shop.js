@@ -55,15 +55,21 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 2800);
   }
 
-  // Build Affiliate Link (Fixes internal affiliate portal links to public consumer Shopee search links)
+  // Build Affiliate Link (Converts offer IDs directly to public consumer item pages)
   function getAffiliateLink(shopeeSearchOrUrl, productId, title) {
     if (!shopeeSearchOrUrl) return '#';
     
-    // Fix internal affiliate portal links if any exist in old database entries
+    // Fix internal affiliate portal offer links
     if (shopeeSearchOrUrl.includes('affiliate.shopee.vn')) {
-      const cleanTitle = title || 'phu kien ca canh';
-      const searchUrl = `https://shopee.vn/search?keyword=${encodeURIComponent(cleanTitle.trim())}`;
-      const encoded = encodeURIComponent(searchUrl);
+      const offerMatch = shopeeSearchOrUrl.match(/\/product_offer\/(\d+)/);
+      let targetUrl = '';
+      if (offerMatch) {
+        targetUrl = `https://shopee.vn/a-i.0.${offerMatch[1]}`;
+      } else {
+        const cleanTitle = title || 'phu kien ca canh';
+        targetUrl = `https://shopee.vn/search?keyword=${encodeURIComponent(cleanTitle.trim())}`;
+      }
+      const encoded = encodeURIComponent(targetUrl);
       return `https://s.shopee.vn/an_redir?origin_link=${encoded}&affiliate_id=${AFFILIATE_ID}&sub_id=shop-supermarket-${productId}`;
     }
 

@@ -5,14 +5,22 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     const affId = request.affId || '17384730538';
     const seenTitles = new Set();
 
-    // 1. Helper function to create clean affiliate URL (prevents double %25 encoding & strips extra tracking params)
+    // Helper to create clean affiliate URL pointing directly to public Shopee item page
     function makeAffUrl(rawUrl, title) {
       let cleanUrl = rawUrl || '';
       try { cleanUrl = decodeURIComponent(cleanUrl); } catch (e) {}
 
-      // If URL is an internal affiliate portal link, convert to public consumer Shopee search URL
-      if (cleanUrl.includes('affiliate.shopee.vn') || !cleanUrl.includes('shopee.vn')) {
-        cleanUrl = `https://shopee.vn/search?keyword=${encodeURIComponent((title || 'phu kien ca canh').trim())}`;
+      // Extract item ID if coming from affiliate portal offer page
+      const offerMatch = cleanUrl.match(/\/product_offer\/(\d+)/);
+      if (offerMatch) {
+        cleanUrl = `https://shopee.vn/a-i.0.${offerMatch[1]}`;
+      } else if (cleanUrl.includes('affiliate.shopee.vn') || !cleanUrl.includes('shopee.vn')) {
+        const itemMatch = cleanUrl.match(/(?:-i\.|\/product\/\d+\/|\/product\/)(\d+)/);
+        if (itemMatch) {
+          cleanUrl = `https://shopee.vn/a-i.0.${itemMatch[1]}`;
+        } else {
+          cleanUrl = `https://shopee.vn/search?keyword=${encodeURIComponent((title || 'phu kien ca canh').trim())}`;
+        }
       } else {
         const qIdx = cleanUrl.indexOf('?');
         if (qIdx > -1) {
@@ -27,7 +35,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       return `https://shop.saigoncacanh.com/r.php?u=${b64}`;
     }
 
-    // 2. Helper function to categorize products based on title keywords
+    // Helper to categorize products based on title keywords
     function detectCategory(title) {
       const cleanT = (title || '').toLowerCase();
       if (cleanT.includes('thức ăn') || cleanT.includes('cám') || cleanT.includes('mồi') || cleanT.includes('tảo') || cleanT.includes('artemia')) {
@@ -42,7 +50,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       return { cat: 'phu-kien', catName: 'Phụ Kiện Bể Cá' };
     }
 
-    // A. SINGLE PRODUCT PAGE SCRAPE
+    // 1. Single Product Page Scrape
     const currUrl = window.location.href;
     const isSingleProduct = currUrl.includes('shopee.vn') && (currUrl.includes('-i.') || currUrl.includes('/product/')) && !currUrl.includes('affiliate.shopee.vn');
 
@@ -96,30 +104,22 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       }
     }
 
-    // B. MULTI-PRODUCT BULK SCRAPE (Shopee.vn Search / Shop / Category & Affiliate Portal affiliate.shopee.vn)
+    // 2. Multi-Product Bulk Scrape
     const productCards = document.querySelectorAll(
       'li.shopee-search-item-result, div[data-sqe="item"], div.shopee-search-item-result__item, div.col-xs-2-4, div.shopee-item-card, div[class*="offer-item"], div[class*="product-item"], div[class*="ProductCard"], div[class*="offer-card"], div[class*="product-offer"]'
     );
-
-    const allImages = (productCards.length > 0) ? [] : document.querySelectorAll('img[src*="susercontent"], img[src*="shopee"]');
 
     if (productCards.length > 0) {
       productCards.forEach((card, idx) => {
         const imgEl = card.querySelector('img[src*="susercontent"]') || card.querySelector('img[src*="shopee"]') || card.querySelector('img');
         const titleEl = card.querySelector('div[data-sqe="name"]') || card.querySelector('div[class*="title"]') || card.querySelector('div[class*="name"]') || card.querySelector('div.C32XTV') || card.querySelector('img[alt]');
         const priceEl = card.querySelector('span._1E9_f') || card.querySelector('div[class*="price"]') || card.querySelector('div.vP2osn') || card.querySelector('span.ZEgDH9');
-        const linkEl = card.querySelector('a[href*="shopee.vn"]') || card.querySelector('a[href*="-i."]') || card.querySelector('a');
+        const linkEl = card.querySelector('a[href*="shopee.vn"]') || card.querySelector('a[href*="/product_offer/"]') || card.querySelector('a[href*="-i."]') || card.querySelector('a');
 
         if (imgEl && (titleEl || imgEl.alt)) {
           const title = titleEl ? (titleEl.textContent || titleEl.alt) : (imgEl.alt || 'Sản Phẩm Shopee');
           const imgUrl = imgEl.src || imgEl.getAttribute('data-src') || '';
           let href = linkEl ? (linkEl.href || linkEl.getAttribute('href') || '') : '';
-          
-          if (!href || href.includes('affiliate.shopee.vn') || !href.includes('shopee.vn')) {
-            href = `https://shopee.vn/search?keyword=${encodeURIComponent(title.trim())}`;
-          } else if (href.startsWith('/')) {
-            href = 'https://shopee.vn' + href;
-          }
 
           const cleanTKey = title.trim().toLowerCase();
 
@@ -143,48 +143,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
               sold: 'Shopee Mall',
               image: imgUrl,
               shopeeUrl: makeAffUrl(href, title.trim()),
-              status: 'active'
-            });
-          }
-        }
-      });
-    } else if (allImages.length > 0) {
-      allImages.forEach((imgEl, idx) => {
-        let parent = imgEl.parentElement;
-        for (let i = 0; i < 4 && parent; i++) {
-          if (parent.textContent.length > 20 && parent.textContent.length < 500) break;
-          parent = parent.parentElement;
-        }
-
-        if (parent) {
-          const titleText = (imgEl.alt || parent.textContent || '').trim();
-          const imgUrl = imgEl.src || imgEl.getAttribute('data-src') || '';
-          const matchPrice = parent.textContent.match(/₫\s*[\d\.\,]+/);
-          const priceText = matchPrice ? matchPrice[0] : 'Deal Ngon';
-          const linkEl = parent.querySelector('a[href]');
-          let href = linkEl ? linkEl.href : `https://shopee.vn/search?keyword=${encodeURIComponent(titleText.substring(0, 50))}`;
-
-          if (!href || href.includes('affiliate.shopee.vn')) {
-            href = `https://shopee.vn/search?keyword=${encodeURIComponent(titleText.substring(0, 50))}`;
-          }
-
-          const cleanTKey = titleText.substring(0, 50).toLowerCase();
-
-          if (imgUrl && titleText.length > 5 && !imgUrl.includes('avatar') && !seenTitles.has(cleanTKey)) {
-            seenTitles.add(cleanTKey);
-            const catInfo = detectCategory(titleText);
-            products.push({
-              id: `sp-aff-${Date.now()}-${idx}`,
-              title: titleText.replace(/\n+/g, ' ').substring(0, 120).trim(),
-              category: catInfo.cat,
-              categoryName: catInfo.catName,
-              price: priceText,
-              originalPrice: 'Shopee Deal',
-              discount: 'HOT',
-              rating: '5.0',
-              sold: 'Shopee Mall',
-              image: imgUrl,
-              shopeeUrl: makeAffUrl(href, titleText.substring(0, 50)),
               status: 'active'
             });
           }
