@@ -100,10 +100,34 @@ document.addEventListener('DOMContentLoaded', () => {
     return `https://s.shopee.vn/an_redir?origin_link=${encoded}&affiliate_id=${AFFILIATE_ID}&sub_id=shop-supermarket-${productId}`;
   }
 
-  // AUTO-CLEAN FILTER: Filters out any out_of_stock products automatically!
+  // Mulberry32 Seeded Random Generator for Daily Product Rotation
+  function seededRandom(seed) {
+    var t = seed += 0x6D2B79F5;
+    t = Math.imul(t ^ t >>> 15, t | 1);
+    t ^= t + Math.imul(t ^ t >>> 8, t | 4);
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  }
+
+  function getTodaySeed() {
+    const d = new Date();
+    return d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate();
+  }
+
+  // AUTO-CLEAN & DAILY SMART SHUFFLE FILTER
   function getActiveProducts() {
     if (typeof PRODUCTS_DATA === 'undefined') return [];
-    return PRODUCTS_DATA.filter(item => item.status === 'active');
+    const active = PRODUCTS_DATA.filter(item => item.status === 'active');
+
+    // Deterministic Daily Shuffle based on today's date seed (YYYYMMDD)
+    const seed = getTodaySeed();
+    const shuffled = [...active];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const rand = seededRandom(seed + i);
+      const j = Math.floor(rand * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+
+    return shuffled;
   }
 
   const PAGE_SIZE = 24;
