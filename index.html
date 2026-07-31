@@ -207,7 +207,7 @@
       </div>
 
       <nav class="nav-menu">
-        <a href="#store-products" class="nav-item" data-tab="products">
+        <a href="#store-products" class="nav-item active" data-tab="products">
           <i class="fa-solid fa-boxes-stacked"></i>
           <span>Quản Lý Kho Siêu Thị</span>
         </a>
@@ -215,7 +215,7 @@
           <i class="fa-solid fa-chart-column"></i>
           <span>Thống Kê Analytics</span>
         </a>
-        <a href="#single-convert" class="nav-item active" data-tab="single">
+        <a href="#single-convert" class="nav-item" data-tab="single">
           <i class="fa-solid fa-link"></i>
           <span>Tạo Link Đơn</span>
         </a>
@@ -273,8 +273,24 @@
     <!-- Main Content Area -->
     <main class="main-content">
       
+      <!-- MOBILE QUICK TAB SWITCHER BAR -->
+      <div class="mobile-quick-tab-bar">
+        <button class="mobile-tab-btn active" data-tab="products">
+          <i class="fa-solid fa-boxes-stacked"></i> Kho Siêu Thị
+        </button>
+        <button class="mobile-tab-btn" data-tab="analytics">
+          <i class="fa-solid fa-chart-column"></i> Báo Cáo
+        </button>
+        <button class="mobile-tab-btn" data-tab="single">
+          <i class="fa-solid fa-link"></i> Tạo Link
+        </button>
+        <button class="mobile-tab-btn" data-tab="chrome">
+          <i class="fa-brands fa-chrome"></i> Extension
+        </button>
+      </div>
+
       <!-- TAB 0: QUẢN LÝ KHO SẢN PHẨM SIÊU THỊ -->
-      <section id="tab-products" class="tab-content hidden">
+      <section id="tab-products" class="tab-content">
         <div class="card">
           <div class="card-header flex-between" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
             <div>
@@ -376,7 +392,7 @@
       </section>
 
       <!-- TAB 1: TẠO LINK ĐƠN -->
-      <section id="tab-single" class="tab-content">
+      <section id="tab-single" class="tab-content hidden">
         <div class="card">
           <div class="card-header">
             <h3><i class="fa-solid fa-wand-magic-sparkles"></i> Chuyển Đổi Link Shopee Đơn Lẻ</h3>

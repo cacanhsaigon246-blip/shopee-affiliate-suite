@@ -99,40 +99,65 @@ document.addEventListener('DOMContentLoaded', () => {
 
   checkAuthStatus();
 
-  // Tab Navigation
+  // Tab Switching Function
+  const mobileTabBtns = document.querySelectorAll('.mobile-tab-btn');
+
+  function switchTab(targetTab) {
+    navItems.forEach(n => {
+      if (n.getAttribute('data-tab') === targetTab) n.classList.add('active');
+      else n.classList.remove('active');
+    });
+
+    mobileTabBtns.forEach(b => {
+      if (b.getAttribute('data-tab') === targetTab) b.classList.add('active');
+      else b.classList.remove('active');
+    });
+
+    tabPanes.forEach(pane => {
+      if (pane.id === `tab-${targetTab}`) {
+        pane.classList.remove('hidden');
+      } else {
+        pane.classList.add('hidden');
+      }
+    });
+
+    if (targetTab === 'products') {
+      loadAdminProducts();
+    } else if (targetTab === 'analytics') {
+      loadAnalytics();
+    }
+
+    if (sidebarNav) {
+      sidebarNav.classList.remove('active');
+      sidebarNav.classList.remove('mobile-open');
+    }
+  }
+
   navItems.forEach(item => {
     item.addEventListener('click', (e) => {
       e.preventDefault();
       const targetTab = item.getAttribute('data-tab');
+      switchTab(targetTab);
+    });
+  });
 
-      navItems.forEach(n => n.classList.remove('active'));
-      item.classList.add('active');
-
-      tabPanes.forEach(pane => {
-        if (pane.id === `tab-${targetTab}`) {
-          pane.classList.remove('hidden');
-        } else {
-          pane.classList.add('hidden');
-        }
-      });
-
-      if (targetTab === 'products') {
-        loadAdminProducts();
-      } else if (targetTab === 'analytics') {
-        loadAnalytics();
-      }
-
-      if (window.innerWidth <= 768 && sidebarNav) {
-        sidebarNav.classList.remove('active');
-      }
+  mobileTabBtns.forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const targetTab = btn.getAttribute('data-tab');
+      switchTab(targetTab);
     });
   });
 
   if (btnToggleMobileMenu && sidebarNav) {
     btnToggleMobileMenu.addEventListener('click', () => {
+      sidebarNav.classList.toggle('mobile-open');
       sidebarNav.classList.toggle('active');
     });
   }
+
+  // Load Admin Products by Default on Init
+  loadAdminProducts();
 
   // Copy Buttons
   document.querySelectorAll('.btn-copy').forEach(btn => {
