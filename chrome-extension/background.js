@@ -1,3 +1,12 @@
+// Service Worker for Shopee Affiliate Extension (Chrome Manifest V3)
+chrome.runtime.onInstalled.addListener(() => {
+  console.log('Shopee Affiliate Extension installed & ready.');
+});
+
+chrome.runtime.onStartup.addListener(() => {
+  console.log('Shopee Affiliate Extension service worker started.');
+});
+
 // Listen to messages from external web dashboard pages (aff.saigoncacanh.com)
 chrome.runtime.onMessageExternal.addListener((request, sender, sendResponse) => {
   if (request.action === 'ping') {
@@ -21,7 +30,6 @@ chrome.runtime.onMessageExternal.addListener((request, sender, sendResponse) => 
         if (itemData) {
           sendResponse({ success: true, data: itemData });
         } else {
-          // Fallback to API v2 if v4 returns null
           fetch(`https://shopee.vn/api/v2/item/get?itemid=${itemid}&shopid=${shopid}`, { credentials: 'include' })
             .then(r => r.json())
             .then(j2 => {
@@ -39,11 +47,9 @@ chrome.runtime.onMessageExternal.addListener((request, sender, sendResponse) => 
         sendResponse({ success: false, error: err.message });
       });
 
-    return true; // Keep message channel open for async response
+    return true;
   } else if (request.action === 'resolve_redirect') {
     const { url } = request;
-    
-    // Follow redirect to get final URL containing shopid & itemid
     fetch(url, {
       method: 'GET',
       redirect: 'follow',
