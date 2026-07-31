@@ -485,22 +485,53 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  if (btnPurgeStore) {
-    btnPurgeStore.addEventListener('click', async () => {
-      if (confirm('⚠️ CẢNH BÁO: Anh Phát có chắc chắn muốn XÓA TRỐNG TOÀN BỘ KHO SẢN PHẨM trên Siêu thị?')) {
-        try {
-          const res = await fetch('https://shop.saigoncacanh.com/purge.php?token=041188');
-          const json = await res.json();
-          if (json && json.success) {
-            adminProducts = [];
-            renderAdminProducts();
-            alert('🎉 ĐÃ XÓA TRỐNG TOÀN BỘ KHO SẢN PHẨM TRÊN SIÊU THỊ THÀNH CÔNG!');
-          } else {
-            alert('Lỗi xóa kho: ' + (json ? json.error : 'Lỗi máy chủ'));
-          }
-        } catch(e) {
-          alert('Không thể kết nối máy chủ: ' + e.message);
+  // 🛡️ SECURITY PIN PROTECTED STORE PURGE
+  const btnPurgeStoreSafe = document.getElementById('btn-purge-store-safe');
+  const modalPurgeConfirm = document.getElementById('modal-purge-confirm');
+  const formPurgePin = document.getElementById('form-purge-pin');
+  const inputPurgePin = document.getElementById('input-purge-pin');
+  const purgePinError = document.getElementById('purge-pin-error');
+  const btnCancelPurgeModal = document.getElementById('btn-cancel-purge-modal');
+
+  if (btnPurgeStoreSafe && modalPurgeConfirm) {
+    btnPurgeStoreSafe.addEventListener('click', () => {
+      inputPurgePin.value = '';
+      if (purgePinError) purgePinError.classList.add('hidden');
+      modalPurgeConfirm.classList.remove('hidden');
+    });
+  }
+
+  if (btnCancelPurgeModal && modalPurgeConfirm) {
+    btnCancelPurgeModal.addEventListener('click', () => {
+      modalPurgeConfirm.classList.add('hidden');
+    });
+  }
+
+  if (formPurgePin) {
+    formPurgePin.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const enteredPin = inputPurgePin.value.trim();
+
+      if (enteredPin !== DEFAULT_PIN) {
+        if (purgePinError) purgePinError.classList.remove('hidden');
+        return;
+      }
+
+      if (purgePinError) purgePinError.classList.add('hidden');
+      modalPurgeConfirm.classList.add('hidden');
+
+      try {
+        const res = await fetch('https://shop.saigoncacanh.com/purge.php?token=041188');
+        const json = await res.json();
+        if (json && json.success) {
+          adminProducts = [];
+          renderAdminProducts();
+          showToast('🎉 ĐÃ XÓA TRỐNG TOÀN BỘ KHO SẢN PHẨM TRÊN SIÊU THỊ THÀNH CÔNG!');
+        } else {
+          alert('Lỗi xóa kho: ' + (json ? json.error : 'Lỗi máy chủ'));
         }
+      } catch(e) {
+        alert('Không thể kết nối máy chủ: ' + e.message);
       }
     });
   }

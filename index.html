@@ -301,7 +301,6 @@
               <button id="btn-reload-admin-products" class="btn btn-secondary btn-sm"><i class="fa-solid fa-rotate"></i> Tải Lại Kho</button>
               <button id="btn-select-all-cards" class="btn btn-secondary btn-sm"><i class="fa-regular fa-square-check"></i> Chọn Tất Cả</button>
               <button id="btn-delete-selected-products" class="btn btn-danger btn-sm"><i class="fa-solid fa-trash-can"></i> Xóa Đã Chọn (<span id="selected-count">0</span>)</button>
-              <button id="btn-purge-store" class="btn btn-danger btn-sm" style="background: #dc2626;"><i class="fa-solid fa-dumpster"></i> Xóa Sạch Kho</button>
             </div>
           </div>
           
@@ -329,6 +328,22 @@
                 <p style="margin-top: 10px;">Đang nạp danh sách sản phẩm từ shop.saigoncacanh.com...</p>
               </div>
             </div>
+
+            <!-- DANGER ZONE COLLAPSED ADVANCED SAFETY SETTINGS -->
+            <div id="danger-zone-box" style="margin-top: 30px; border-top: 1px dashed rgba(239, 68, 68, 0.3); padding-top: 15px;">
+              <details style="background: rgba(239, 68, 68, 0.05); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 10px; padding: 12px 16px;">
+                <summary style="color: #ef4444; font-weight: 700; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 8px;">
+                  <i class="fa-solid fa-triangle-exclamation"></i> ⚠️ Cấu Hình Nâng Cao / Khu Vực Nguy Hiểm (Bấm để mở)
+                </summary>
+                <div style="margin-top: 12px; font-size: 12px; color: #94a3b8;">
+                  <p style="margin-bottom: 10px;">Chức năng này dùng để dọn dẹp sạch toàn bộ kho Siêu thị. Yêu cầu nhập đúng <b>Mã PIN Bảo Mật (041188)</b> mới có thể thực hiện.</p>
+                  <button id="btn-purge-store-safe" class="btn btn-danger btn-sm" style="background: #dc2626; border: none; padding: 8px 14px;">
+                    <i class="fa-solid fa-lock"></i> Xóa Trống Kho Siêu Thị (Bảo Vệ Lớp 2)
+                  </button>
+                </div>
+              </details>
+            </div>
+
           </div>
         </div>
       </section>
@@ -763,6 +778,30 @@ if __name__ == '__main__':
         <button id="btn-copy-modal-post" class="btn btn-primary btn-block" style="flex: 2;"><i class="fa-regular fa-copy"></i> Sao Chép Toàn Bộ Bài Đăng</button>
         <a id="modal-post-img-download" href="#" target="_blank" download="san-pham-shopee.jpg" class="btn btn-secondary" style="flex: 1; text-align: center; text-decoration: none; padding: 10px; font-size: 12px;"><i class="fa-solid fa-download"></i> Tải Ảnh</a>
       </div>
+    </div>
+  </div>
+
+  <!-- SECURITY PIN PURGE CONFIRMATION MODAL -->
+  <div id="modal-purge-confirm" class="login-overlay hidden">
+    <div class="login-card" style="max-width: 420px; border-color: #ef4444;">
+      <div class="login-header">
+        <div class="login-brand-icon" style="background: linear-gradient(135deg, #ef4444, #dc2626);">
+          <i class="fa-solid fa-shield-cat"></i>
+        </div>
+        <h3 style="color: #ef4444; font-size: 18px; font-weight: 800; margin-top: 10px;">🛑 XÁC NHẬN BẢO MẬT XÓA KHO</h3>
+        <p style="color: #cbd5e1; font-size: 13px; margin-top: 4px;">Bạn đang thực hiện dọn sạch toàn bộ 1.400+ sản phẩm khỏi Siêu Thị shop.saigoncacanh.com.</p>
+      </div>
+      <form id="form-purge-pin" style="margin-top: 15px;">
+        <div class="form-group" style="text-align: left;">
+          <label style="color: #f8fafc; font-size: 12px; font-weight: 700; display: block; margin-bottom: 6px;">Vui lòng nhập Mã PIN Bảo Mật (041188):</label>
+          <input type="password" id="input-purge-pin" class="form-control" placeholder="••••••••" required style="width: 100%; font-size: 16px; text-align: center; letter-spacing: 4px;">
+          <small id="purge-pin-error" class="login-error-msg hidden" style="margin-top: 6px; display: block;"><i class="fa-solid fa-circle-exclamation"></i> Mã PIN bảo mật không chính xác!</small>
+        </div>
+        <div style="display: flex; gap: 10px; margin-top: 20px;">
+          <button type="button" id="btn-cancel-purge-modal" class="btn btn-secondary" style="flex: 1;">Hủy Bỏ</button>
+          <button type="submit" id="btn-confirm-purge-pin" class="btn btn-danger" style="flex: 1.2; background: #ef4444;"><i class="fa-solid fa-lock"></i> Xác Nhận Xóa</button>
+        </div>
+      </form>
     </div>
   </div>
 
