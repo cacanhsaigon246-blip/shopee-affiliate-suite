@@ -60,26 +60,33 @@ $finalProducts = [];
 if ($mode === 'replace' || count($existingProducts) === 0) {
     $finalProducts = $data['products'];
 } else {
-    // Smart Merge: Keep existing products, update matching ones, append new ones
-    $urlMap = [];
+    // Smart Merge: Key by normalized Title to ensure bulletproof deduplication & seamless appending
+    function makeTitleKey($str) {
+        $clean = mb_strtolower(trim($str), 'UTF-8');
+        return preg_replace('/[^\w\d\p{L}]/u', '', $clean);
+    }
+
+    $productMap = [];
     foreach ($existingProducts as $idx => $p) {
-        $key = isset($p['shopeeUrl']) ? $p['shopeeUrl'] : (isset($p['title']) ? $p['title'] : $idx);
-        $urlMap[$key] = $p;
+        $tKey = (isset($p['title']) && !empty($p['title'])) ? makeTitleKey($p['title']) : ('idx_' . $idx);
+        $productMap[$tKey] = $p;
     }
 
     foreach ($data['products'] as $newP) {
-        $key = isset($newP['shopeeUrl']) ? $newP['shopeeUrl'] : (isset($newP['title']) ? $newP['title'] : null);
-        if ($key && isset($urlMap[$key])) {
-            // Update existing entry with new image/price/title
-            $urlMap[$key] = array_merge($urlMap[$key], array_filter($newP));
+        if (!isset($newP['title']) || empty(trim($newP['title']))) continue;
+        $tKey = makeTitleKey($newP['title']);
+
+        if (isset($productMap[$tKey])) {
+            // Update existing entry with new image/price/link
+            $productMap[$tKey] = array_merge($productMap[$tKey], array_filter($newP));
         } else {
-            // New product entry
-            $newP['id'] = 'sp-' . (count($urlMap) + 1);
-            $urlMap['new_' . count($urlMap)] = $newP;
+            // Brand new product entry -> Append
+            $newP['id'] = 'sp-' . (count($productMap) + 1);
+            $productMap[$tKey] = $newP;
         }
     }
 
-    $finalProducts = array_values($urlMap);
+    $finalProducts = array_values($productMap);
 }
 
 // -------------------------------------------------------------
@@ -96,7 +103,7 @@ foreach ($finalProducts as &$prod) {
     if (isset($prod['image']) && strpos($prod['image'], 'http') === 0 && strpos($prod['image'], $baseUrl) === false) {
         $remoteImg = $prod['image'];
         // Hash filename to avoid collisions
-        $fileHash = md5($prod['id'] . '_' . (isset($prod['shopeeUrl']) ? $prod['shopeeUrl'] : $prod['title']));
+        $fileHash = md5($prod['id'] . '_' . (isset($prod['title']) ? $prod['title'] : $prod['id']));
         $localFileName = "img_" . $fileHash . ".jpg";
         $localFilePath = $imgDir . "/" . $localFileName;
 
