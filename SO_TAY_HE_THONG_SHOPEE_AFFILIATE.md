@@ -99,6 +99,16 @@
   5. 💬 *Gợi Ý Đồng Ngư Sài Gòn Cá Cảnh*
 * **Cơ Chế:** Tự nạp sản phẩm HOT chưa đăng, tự động chuẩn hóa giá VND, bọc link ngắn `shop.saigoncacanh.com/r.php?u=...` kèm mã Affiliate ID `17384730538`, và đăng lên Fanpage `Sài Gòn Cá Cảnh - 246 Hồ Văn Huê` qua Meta Graph API.
 
+### 🤖 3.6. Cổng API Tra Cứu Siêu Tốc Cho Chatbot & AI (`chatbot-api.php`)
+* **Địa chỉ Cổng API:** `https://shop.saigoncacanh.com/chatbot-api.php`
+* **Tham Số Tra Cứu:**
+  - `?q=tu-khoa` : Tìm kiếm sản phẩm theo từ khóa Tiếng Việt không dấu (Ví dụ: `?q=may+bom`, `?q=cam+ca`).
+  - `?cat=danh-muc` : Lọc sản phẩm theo danh mục (`thuc-an`, `bom-loc`, `den-led`, `thuoc-men`, `phu-kien`).
+  - `?limit=10` : Giới hạn số lượng sản phẩm trả về (Tối đa 50).
+* **Đặc Điểm Kỹ Thuật:**
+  - Tốc độ phản hồi **< 0.005 giây**, hỗ trợ CORS `Access-Control-Allow-Origin: *`.
+  - Tự động mã hóa đính kèm **Link Affiliate Ngắn** `https://shop.saigoncacanh.com/r.php?u=...` kèm mã `17384730538` sẵn sàng để Chatbot dán trực tiếp tư vấn cho khách mua hàng!
+
 ---
 
 ## 📖 4. QUY TRÌNH VẬN HÀNH HẰNG NGÀY CHO ANH PHÁT

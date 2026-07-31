@@ -51,5 +51,6 @@ Upload-FileToFtp "$localBase\get-analytics.php" "$remoteBase/get-analytics.php"
 Upload-FileToFtp "$localBase\purge.php" "$remoteBase/purge.php"
 Upload-FileToFtp "$localBase\shorten.php" "$remoteBase/shorten.php"
 Upload-FileToFtp "$localBase\r.php" "$remoteBase/r.php"
+Upload-FileToFtp "$localBase\chatbot-api.php" "$remoteBase/chatbot-api.php"
 
 Write-Host "=== FTP UPLOAD TO SHOP.SAIGONCACANH.COM COMPLETED SUCCESSFULLY ==="
