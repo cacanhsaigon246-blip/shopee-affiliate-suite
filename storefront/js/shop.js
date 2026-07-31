@@ -106,8 +106,10 @@ document.addEventListener('DOMContentLoaded', () => {
     return PRODUCTS_DATA.filter(item => item.status === 'active');
   }
 
-  // Render Products Grid with Smart Unaccented Vietnamese Search!
-  function renderProducts() {
+  const PAGE_SIZE = 24;
+  let currentPage = 1;
+
+  function renderProducts(isLoadMore = false) {
     const activeData = getActiveProducts();
     const cleanSearchQuery = removeVietnameseTones(searchQuery);
     
@@ -122,73 +124,116 @@ document.addEventListener('DOMContentLoaded', () => {
       return titleClean.includes(cleanSearchQuery) || catClean.includes(cleanSearchQuery);
     });
 
-    productGrid.innerHTML = '';
     productCount.textContent = filtered.length;
+
+    if (!isLoadMore) {
+      currentPage = 1;
+      productGrid.innerHTML = '';
+    }
 
     if (filtered.length === 0) {
       emptyState.classList.remove('hidden');
       productGrid.classList.add('hidden');
-    } else {
-      emptyState.classList.add('hidden');
-      productGrid.classList.remove('hidden');
+      removeLoadMoreButton();
+      return;
+    }
 
-      filtered.forEach((item, idx) => {
-        const affLink = getAffiliateLink(item.shopeeUrl, item.id, item.title);
-        const card = document.createElement('div');
-        card.className = 'product-card';
-        
-        // Dynamic promo badge tag for visual flair
-        let promoTag = item.discount || 'HOT';
-        if (idx % 3 === 0) promoTag = '🔥 TOP BÁN CHẠY';
-        else if (idx % 3 === 1) promoTag = '⚡ FLASH SALE';
-        else promoTag = '🚚 FREESHIP XTRA';
+    emptyState.classList.add('hidden');
+    productGrid.classList.remove('hidden');
 
-        card.innerHTML = `
-          <div class="product-img-wrapper">
-            <img src="${item.image}" alt="${item.title}" loading="lazy">
-            <span class="discount-tag">${promoTag}</span>
-            <span class="shopee-badge"><i class="fa-solid fa-bag-shopping"></i> Shopee</span>
+    const visibleItems = filtered.slice(0, currentPage * PAGE_SIZE);
+
+    const itemsToDraw = isLoadMore 
+      ? filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE) 
+      : visibleItems;
+
+    itemsToDraw.forEach((item, idx) => {
+      const affLink = getAffiliateLink(item.shopeeUrl, item.id, item.title);
+      const card = document.createElement('div');
+      card.className = 'product-card';
+      
+      let promoTag = item.discount || 'HOT';
+      if (idx % 3 === 0) promoTag = '🔥 TOP BÁN CHẠY';
+      else if (idx % 3 === 1) promoTag = '⚡ FLASH SALE';
+      else promoTag = '🚚 FREESHIP XTRA';
+
+      card.innerHTML = `
+        <div class="product-img-wrapper">
+          <img src="${item.image}" alt="${item.title}" loading="lazy">
+          <span class="discount-tag">${promoTag}</span>
+          <span class="shopee-badge"><i class="fa-solid fa-bag-shopping"></i> Shopee</span>
+        </div>
+        <div class="product-info">
+          <span class="product-cat">${item.categoryName}</span>
+          <h3 class="product-title" title="${item.title}">${item.title}</h3>
+          <div class="price-box">
+            <span class="current-price">${item.price}</span>
+            <span class="original-price">${item.originalPrice}</span>
           </div>
-          <div class="product-info">
-            <span class="product-cat">${item.categoryName}</span>
-            <h3 class="product-title" title="${item.title}">${item.title}</h3>
-            <div class="price-box">
-              <span class="current-price">${item.price}</span>
-              <span class="original-price">${item.originalPrice}</span>
-            </div>
-            <div class="product-actions">
-              <a href="${affLink}" target="_blank" class="btn-buy-shopee" data-id="${item.id}">
-                <i class="fa-solid fa-bolt"></i> MUA NAY
-              </a>
-              <button class="btn-add-cart" data-id="${item.id}" title="Thêm vào danh sách mua">
-                <i class="fa-solid fa-plus"></i>
-              </button>
-            </div>
+          <div class="product-actions">
+            <a href="${affLink}" target="_blank" class="btn-buy-shopee" data-id="${item.id}">
+              <i class="fa-solid fa-bolt"></i> MUA NAY
+            </a>
+            <button class="btn-add-cart" data-id="${item.id}" title="Thêm vào danh sách mua">
+              <i class="fa-solid fa-plus"></i>
+            </button>
           </div>
-        `;
-        productGrid.appendChild(card);
-      });
+        </div>
+      `;
+      productGrid.appendChild(card);
+    });
 
-      // Attach Buy Button Click Tracking
-      productGrid.querySelectorAll('.btn-buy-shopee').forEach(btn => {
+    productGrid.querySelectorAll('.btn-buy-shopee').forEach(btn => {
+      if (!btn.hasAttribute('data-tracked')) {
+        btn.setAttribute('data-tracked', 'true');
         btn.addEventListener('click', () => {
           const pId = btn.getAttribute('data-id');
           if (pId) {
-            try {
-              fetch(`https://shop.saigoncacanh.com/track-click.php?id=${encodeURIComponent(pId)}`, { mode: 'no-cors' });
-            } catch(e) {}
+            try { fetch(`https://shop.saigoncacanh.com/track-click.php?id=${encodeURIComponent(pId)}`, { mode: 'no-cors' }); } catch(e){}
           }
         });
-      });
+      }
+    });
 
-      // Attach Add Cart Listeners
-      productGrid.querySelectorAll('.btn-add-cart').forEach(btn => {
+    productGrid.querySelectorAll('.btn-add-cart').forEach(btn => {
+      if (!btn.hasAttribute('data-tracked')) {
+        btn.setAttribute('data-tracked', 'true');
         btn.addEventListener('click', () => {
           const pId = btn.getAttribute('data-id');
           addToWishlist(pId);
         });
+      }
+    });
+
+    updateLoadMoreButton(filtered.length);
+  }
+
+  function updateLoadMoreButton(totalFilteredCount) {
+    removeLoadMoreButton();
+
+    const loadedCount = currentPage * PAGE_SIZE;
+    if (loadedCount < totalFilteredCount) {
+      const remaining = totalFilteredCount - loadedCount;
+      const btnBox = document.createElement('div');
+      btnBox.id = 'load-more-wrapper';
+      btnBox.style.cssText = 'grid-column: 1 / -1; text-align: center; margin-top: 30px; margin-bottom: 20px;';
+      btnBox.innerHTML = `
+        <button id="btn-load-more-prods" class="btn-load-more" style="background: linear-gradient(135deg, #ff5722, #f97316); color: #fff; border: none; padding: 14px 32px; border-radius: 30px; font-weight: 800; font-size: 15px; cursor: pointer; box-shadow: 0 6px 20px rgba(249, 115, 22, 0.35); transition: transform 0.2s ease;">
+          <i class="fa-solid fa-angles-down"></i> XEM THÊM ${Math.min(PAGE_SIZE, remaining)} SẢN PHẨM (Còn ${remaining.toLocaleString('vi-VN')} món)
+        </button>
+      `;
+      productGrid.parentElement.appendChild(btnBox);
+
+      document.getElementById('btn-load-more-prods').addEventListener('click', () => {
+        currentPage++;
+        renderProducts(true);
       });
     }
+  }
+
+  function removeLoadMoreButton() {
+    const existing = document.getElementById('load-more-wrapper');
+    if (existing) existing.remove();
   }
 
   // Category Pill Switcher
