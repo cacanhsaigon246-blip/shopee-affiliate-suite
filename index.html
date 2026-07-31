@@ -12,7 +12,129 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="css/style.css?v=2.6">
+  <link rel="stylesheet" href="css/style.css?v=3.0">
+  <style>
+    /* Premium Storefront Card Grid Layout for Admin Manager */
+    .admin-grid-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+      gap: 18px;
+      margin-top: 15px;
+    }
+    .admin-prod-card {
+      background: #181f2c;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .admin-prod-card:hover {
+      transform: translateY(-4px);
+      border-color: #f97316;
+      box-shadow: 0 8px 24px rgba(249, 115, 22, 0.15);
+    }
+    .admin-prod-card.selected {
+      border-color: #ef4444;
+      background: rgba(239, 68, 68, 0.08);
+    }
+    .admin-card-img-wrap {
+      position: relative;
+      width: 100%;
+      height: 160px;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 10px;
+    }
+    .admin-card-img-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .admin-card-chk {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      width: 22px;
+      height: 22px;
+      cursor: pointer;
+      z-index: 5;
+      accent-color: #ef4444;
+    }
+    .admin-card-cat-badge {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(4px);
+      color: #38bdf8;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 12px;
+      border: 1px solid rgba(56, 189, 248, 0.3);
+    }
+    .admin-card-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: #f8fafc;
+      line-height: 1.4;
+      height: 36px;
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      margin-bottom: 8px;
+    }
+    .admin-card-price {
+      color: #ff5722;
+      font-weight: 800;
+      font-size: 15px;
+      margin-bottom: 12px;
+    }
+    .admin-card-actions {
+      display: flex;
+      gap: 6px;
+      margin-top: auto;
+    }
+    .btn-admin-del {
+      flex: 1;
+      background: #ef4444;
+      color: #fff;
+      border: none;
+      padding: 8px 10px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      transition: background 0.15s ease;
+    }
+    .btn-admin-del:hover {
+      background: #dc2626;
+    }
+    .btn-admin-view {
+      background: rgba(255, 255, 255, 0.1);
+      color: #cbd5e1;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      padding: 8px 10px;
+      border-radius: 8px;
+      font-size: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .btn-admin-view:hover {
+      background: rgba(255, 255, 255, 0.2);
+      color: #fff;
+    }
+  </style>
 </head>
 <body>
 
@@ -136,26 +258,27 @@
     <!-- Main Content Area -->
     <main class="main-content">
       
-      <!-- TAB 0: QUẢN LÝ KHO SẢN PHẨM SIÊU THỊ -->
+      <!-- TAB 0: QUẢN LÝ KHO SẢN PHẨM SIÊU THỊ (GIAO DIỆN THẺ SẢN PHẨM RỘNG RÃI) -->
       <section id="tab-products" class="tab-content hidden">
         <div class="card">
-          <div class="card-header flex-between" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+          <div class="card-header flex-between" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
             <div>
-              <h3><i class="fa-solid fa-boxes-stacked"></i> QUẢN LÝ KHO SẢN PHẨM SIÊU THỊ (shop.saigoncacanh.com)</h3>
-              <p class="subtitle">Tự động đồng bộ 2 chiều với Cửa hàng Siêu thị. Quản lý, xóa bớt sản phẩm rác hoặc phân loại danh mục sản phẩm.</p>
+              <h3 style="color: #f97316; font-size: 18px;"><i class="fa-solid fa-boxes-stacked"></i> QUẢN LÝ KHO SIÊU THỊ (shop.saigoncacanh.com)</h3>
+              <p class="subtitle">Đồng bộ 2 chiều thời gian thực. Giao diện dạng Thẻ Sản Phẩm lớn, dễ nhìn, chống mỏi mắt.</p>
             </div>
             <div style="display: flex; gap: 8px; flex-wrap: wrap;">
               <button id="btn-reload-admin-products" class="btn btn-secondary btn-sm"><i class="fa-solid fa-rotate"></i> Tải Lại Kho</button>
+              <button id="btn-select-all-cards" class="btn btn-secondary btn-sm"><i class="fa-regular fa-square-check"></i> Chọn Tất Cả</button>
               <button id="btn-delete-selected-products" class="btn btn-danger btn-sm"><i class="fa-solid fa-trash-can"></i> Xóa Đã Chọn (<span id="selected-count">0</span>)</button>
               <button id="btn-purge-store" class="btn btn-danger btn-sm" style="background: #dc2626;"><i class="fa-solid fa-dumpster"></i> Xóa Sạch Kho</button>
             </div>
           </div>
           
           <div class="card-body">
-            <!-- Filter Bar & Search -->
-            <div style="display: flex; gap: 12px; margin-bottom: 15px; flex-wrap: wrap; align-items: center;">
-              <div style="flex: 1; min-width: 250px; position: relative;">
-                <input type="text" id="admin-search-input" class="form-control" placeholder="🔍 Tìm kiếm sản phẩm trong kho (gõ có dấu hoặc không dấu)..." style="width: 100%; padding-right: 30px;">
+            <!-- Search & Filter Controls -->
+            <div style="display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; align-items: center;">
+              <div style="flex: 1; min-width: 260px; position: relative;">
+                <input type="text" id="admin-search-input" class="form-control" placeholder="🔍 Tìm kiếm sản phẩm (gõ từ khóa có dấu hoặc không dấu)..." style="width: 100%; padding-right: 32px;">
                 <button id="btn-clear-admin-search" class="hidden" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #aaa; cursor: pointer;">×</button>
               </div>
               <div style="display: flex; gap: 6px; flex-wrap: wrap;">
@@ -168,23 +291,12 @@
               </div>
             </div>
 
-            <!-- Products Table -->
-            <div class="table-responsive" style="max-height: 600px; overflow-y: auto; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px;">
-              <table class="table" style="width: 100%; border-collapse: collapse; text-align: left;">
-                <thead>
-                  <tr style="background: rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.1);">
-                    <th style="padding: 10px; width: 40px; text-align: center;"><input type="checkbox" id="chk-select-all-admin"></th>
-                    <th style="padding: 10px; width: 70px;">Hình Ảnh</th>
-                    <th style="padding: 10px;">Tên Sản Phẩm</th>
-                    <th style="padding: 10px; width: 140px;">Kệ Hàng / Danh Mục</th>
-                    <th style="padding: 10px; width: 100px;">Giá Bán</th>
-                    <th style="padding: 10px; width: 120px; text-align: center;">Thao Tác</th>
-                  </tr>
-                </thead>
-                <tbody id="admin-product-table-body">
-                  <tr><td colspan="6" style="text-align: center; padding: 20px; color: #888;">Đang tải danh sách kho hàng...</td></tr>
-                </tbody>
-              </table>
+            <!-- PRODUCT CARDS GRID CONTAINER -->
+            <div id="admin-cards-grid" class="admin-grid-container">
+              <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #888;">
+                <i class="fa-solid fa-spinner fa-spin fa-2x"></i>
+                <p style="margin-top: 10px;">Đang nạp danh sách sản phẩm từ shop.saigoncacanh.com...</p>
+              </div>
             </div>
           </div>
         </div>
@@ -534,6 +646,6 @@ if __name__ == '__main__':
     <span id="toast-msg">Đã sao chép vào bộ nhớ tạm!</span>
   </div>
 
-  <script src="js/app.js?v=5.0"></script>
+  <script src="js/app.js?v=6.0"></script>
 </body>
 </html>

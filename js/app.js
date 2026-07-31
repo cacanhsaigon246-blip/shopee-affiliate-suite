@@ -2,10 +2,6 @@ document.addEventListener('DOMContentLoaded', () => {
   // Mobile Navigation Elements
   const btnToggleMobileMenu = document.getElementById('btn-toggle-mobile-menu');
   const sidebarNav = document.getElementById('sidebar-nav');
-  const mobileMenuBackdrop = document.getElementById('mobile-menu-backdrop');
-  const mobileMenuIcon = document.getElementById('mobile-menu-icon');
-
-  // Authentication Elements
   const loginLockOverlay = document.getElementById('login-lock-overlay');
   const appMainContent = document.getElementById('app-main-content');
   const loginForm = document.getElementById('login-form');
@@ -165,13 +161,11 @@ document.addEventListener('DOMContentLoaded', () => {
       
       document.getElementById('single-res-full').value = fullLink;
 
-      // Shorten Link via r.php
       const b64 = btoa(unescape(encodeURIComponent(fullLink)))
         .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
       const shortLink = `https://shop.saigoncacanh.com/r.php?u=${b64}`;
       document.getElementById('single-res-short').value = shortLink;
 
-      // Generate QR Code
       const qrBox = document.getElementById('single-qr-code');
       qrBox.innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(shortLink)}" alt="QR Code" style="width: 150px; height: 150px; border-radius: 8px;">`;
 
@@ -230,7 +224,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ==========================================
-  // STOREFRONT PRODUCT MANAGER (aff.saigoncacanh.com <-> shop.saigoncacanh.com)
+  // STOREFRONT PRODUCT MANAGER - PRODUCT CARDS GRID LAYOUT
   // ==========================================
   let adminProducts = [];
   let currentAdminCategory = 'all';
@@ -239,17 +233,22 @@ document.addEventListener('DOMContentLoaded', () => {
   const adminSearchInput = document.getElementById('admin-search-input');
   const btnClearAdminSearch = document.getElementById('btn-clear-admin-search');
   const adminCatPills = document.querySelectorAll('.admin-cat-pill');
-  const adminProductTableBody = document.getElementById('admin-product-table-body');
+  const adminCardsGrid = document.getElementById('admin-cards-grid');
   const totalAdminCount = document.getElementById('total-admin-count');
   const selectedCountEl = document.getElementById('selected-count');
-  const chkSelectAllAdmin = document.getElementById('chk-select-all-admin');
+  const btnSelectAllCards = document.getElementById('btn-select-all-cards');
   const btnReloadAdminProducts = document.getElementById('btn-reload-admin-products');
   const btnDeleteSelectedProducts = document.getElementById('btn-delete-selected-products');
   const btnPurgeStore = document.getElementById('btn-purge-store');
 
   async function loadAdminProducts() {
-    if (!adminProductTableBody) return;
-    adminProductTableBody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 20px; color: #888;"><i class="fa-solid fa-spinner fa-spin"></i> Đang nạp danh sách kho hàng từ shop.saigoncacanh.com...</td></tr>';
+    if (!adminCardsGrid) return;
+    adminCardsGrid.innerHTML = `
+      <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #888;">
+        <i class="fa-solid fa-spinner fa-spin fa-2x"></i>
+        <p style="margin-top: 10px;">Đang nạp kho hàng từ shop.saigoncacanh.com...</p>
+      </div>
+    `;
     
     try {
       const res = await fetch(`https://shop.saigoncacanh.com/get-products.php?v=${Date.now()}`);
@@ -266,7 +265,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function renderAdminProducts() {
-    if (!adminProductTableBody) return;
+    if (!adminCardsGrid) return;
     const cleanQuery = removeVietnameseTones(adminSearchQuery);
 
     const filtered = adminProducts.filter(item => {
@@ -280,54 +279,58 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     if (totalAdminCount) totalAdminCount.textContent = adminProducts.length;
-    if (chkSelectAllAdmin) chkSelectAllAdmin.checked = false;
     updateSelectedCount();
 
     if (filtered.length === 0) {
-      adminProductTableBody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 25px; color: #888;">Kho hàng chưa có sản phẩm nào phù hợp.</td></tr>';
+      adminCardsGrid.innerHTML = `
+        <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #888;">
+          <i class="fa-solid fa-box-open fa-3x" style="margin-bottom: 12px; opacity: 0.5;"></i>
+          <p>Kho hàng chưa có sản phẩm nào phù hợp.</p>
+        </div>
+      `;
       return;
     }
 
-    adminProductTableBody.innerHTML = '';
+    adminCardsGrid.innerHTML = '';
     filtered.forEach((item) => {
-      const tr = document.createElement('tr');
-      tr.style.borderBottom = '1px solid rgba(255,255,255,0.05)';
-      tr.innerHTML = `
-        <td style="padding: 10px; text-align: center;">
-          <input type="checkbox" class="chk-admin-item" data-id="${item.id}">
-        </td>
-        <td style="padding: 10px;">
-          <img src="${item.image}" alt="${item.title}" style="width: 48px; height: 48px; object-fit: cover; border-radius: 6px;" loading="lazy">
-        </td>
-        <td style="padding: 10px;">
-          <div style="font-weight: 600; color: #fff; line-height: 1.3; font-size: 13px;">${item.title}</div>
-          <small style="color: #888; font-size: 11px;">ID: ${item.id}</small>
-        </td>
-        <td style="padding: 10px;">
-          <span style="background: rgba(255,255,255,0.1); color: #38bdf8; padding: 3px 8px; border-radius: 12px; font-size: 11px;">${item.categoryName || 'Phụ Kiện'}</span>
-        </td>
-        <td style="padding: 10px; color: #f43f5e; font-weight: 600; font-size: 13px;">
-          ${item.price || 'Deal Ngon'}
-        </td>
-        <td style="padding: 10px; text-align: center;">
-          <div style="display: flex; gap: 6px; justify-content: center;">
-            <a href="${item.shopeeUrl}" target="_blank" class="btn btn-secondary btn-sm" title="Xem trên Shopee" style="padding: 4px 8px; font-size: 11px;">
-              <i class="fa-solid fa-arrow-up-right-from-square"></i>
-            </a>
-            <button class="btn btn-danger btn-sm btn-delete-single-admin" data-id="${item.id}" title="Xóa sản phẩm này" style="padding: 4px 8px; font-size: 11px;">
-              <i class="fa-solid fa-trash"></i>
-            </button>
-          </div>
-        </td>
+      const card = document.createElement('div');
+      card.className = 'admin-prod-card';
+      card.setAttribute('data-id', item.id);
+      
+      card.innerHTML = `
+        <div class="admin-card-img-wrap">
+          <input type="checkbox" class="chk-admin-item admin-card-chk" data-id="${item.id}">
+          <span class="admin-card-cat-badge">${item.categoryName || 'Phụ Kiện'}</span>
+          <img src="${item.image}" alt="${item.title}" loading="lazy">
+        </div>
+        <div class="admin-card-title" title="${item.title}">${item.title}</div>
+        <div class="admin-card-price">${item.price || 'Deal Ngon'}</div>
+        <div class="admin-card-actions">
+          <button class="btn-admin-del btn-delete-single-admin" data-id="${item.id}" title="Xóa sản phẩm này">
+            <i class="fa-solid fa-trash"></i> Xóa
+          </button>
+          <a href="${item.shopeeUrl}" target="_blank" class="btn-admin-view" title="Xem trên Shopee">
+            <i class="fa-solid fa-arrow-up-right-from-square"></i> Shopee
+          </a>
+        </div>
       `;
-      adminProductTableBody.appendChild(tr);
+      adminCardsGrid.appendChild(card);
     });
 
-    adminProductTableBody.querySelectorAll('.chk-admin-item').forEach(chk => {
-      chk.addEventListener('change', updateSelectedCount);
+    // Attach checkbox listeners to toggle .selected style on card
+    adminCardsGrid.querySelectorAll('.chk-admin-item').forEach(chk => {
+      chk.addEventListener('change', () => {
+        const cardParent = chk.closest('.admin-prod-card');
+        if (cardParent) {
+          if (chk.checked) cardParent.classList.add('selected');
+          else cardParent.classList.remove('selected');
+        }
+        updateSelectedCount();
+      });
     });
 
-    adminProductTableBody.querySelectorAll('.btn-delete-single-admin').forEach(btn => {
+    // Attach single delete listener
+    adminCardsGrid.querySelectorAll('.btn-delete-single-admin').forEach(btn => {
       btn.addEventListener('click', () => {
         const pId = btn.getAttribute('data-id');
         deleteSingleAdminProduct(pId);
@@ -336,17 +339,26 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function updateSelectedCount() {
-    if (!adminProductTableBody || !selectedCountEl) return;
-    const selected = adminProductTableBody.querySelectorAll('.chk-admin-item:checked');
+    if (!adminCardsGrid || !selectedCountEl) return;
+    const selected = adminCardsGrid.querySelectorAll('.chk-admin-item:checked');
     selectedCountEl.textContent = selected.length;
   }
 
-  if (chkSelectAllAdmin) {
-    chkSelectAllAdmin.addEventListener('change', (e) => {
-      const isChecked = e.target.checked;
-      adminProductTableBody.querySelectorAll('.chk-admin-item').forEach(chk => {
-        chk.checked = isChecked;
+  let allSelectedState = false;
+  if (btnSelectAllCards) {
+    btnSelectAllCards.addEventListener('click', () => {
+      allSelectedState = !allSelectedState;
+      adminCardsGrid.querySelectorAll('.chk-admin-item').forEach(chk => {
+        chk.checked = allSelectedState;
+        const cardParent = chk.closest('.admin-prod-card');
+        if (cardParent) {
+          if (allSelectedState) cardParent.classList.add('selected');
+          else cardParent.classList.remove('selected');
+        }
       });
+      btnSelectAllCards.innerHTML = allSelectedState 
+        ? '<i class="fa-regular fa-square"></i> Bỏ Chọn Tất Cả' 
+        : '<i class="fa-regular fa-square-check"></i> Chọn Tất Cả';
       updateSelectedCount();
     });
   }
@@ -415,7 +427,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const item = adminProducts.find(p => p.id === pId);
     if (!item) return;
 
-    if (confirm(`Anh có chắc chắn muốn xóa sản phẩm:\n"${item.title}"?`)) {
+    if (confirm(`Anh Phát có chắc chắn muốn xóa sản phẩm:\n"${item.title}"?`)) {
       const updated = adminProducts.filter(p => p.id !== pId);
       await syncProductsToHostinger(updated, 'Đã xóa sản phẩm khỏi Siêu Thị!');
     }
@@ -423,7 +435,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (btnDeleteSelectedProducts) {
     btnDeleteSelectedProducts.addEventListener('click', async () => {
-      const checked = Array.from(adminProductTableBody.querySelectorAll('.chk-admin-item:checked')).map(c => c.getAttribute('data-id'));
+      const checked = Array.from(adminCardsGrid.querySelectorAll('.chk-admin-item:checked')).map(c => c.getAttribute('data-id'));
       if (checked.length === 0) {
         alert('Vui lòng chọn ít nhất 1 sản phẩm để xóa!');
         return;
