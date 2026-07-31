@@ -12,7 +12,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="css/style.css?v=3.0">
+  <link rel="stylesheet" href="css/style.css?v=3.5">
+  <!-- Chart.js CDN for Analytics -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     /* Premium Storefront Card Grid Layout for Admin Manager */
     .admin-grid-container {
@@ -98,41 +100,50 @@
       display: flex;
       gap: 6px;
       margin-top: auto;
+      flex-wrap: wrap;
     }
     .btn-admin-del {
       flex: 1;
       background: #ef4444;
       color: #fff;
       border: none;
-      padding: 8px 10px;
+      padding: 7px 8px;
       border-radius: 8px;
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 600;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 5px;
-      transition: background 0.15s ease;
+      gap: 4px;
     }
-    .btn-admin-del:hover {
-      background: #dc2626;
+    .btn-admin-post {
+      flex: 1.2;
+      background: #f97316;
+      color: #fff;
+      border: none;
+      padding: 7px 8px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
     }
     .btn-admin-view {
       background: rgba(255, 255, 255, 0.1);
       color: #cbd5e1;
       border: 1px solid rgba(255, 255, 255, 0.15);
-      padding: 8px 10px;
+      padding: 7px 8px;
       border-radius: 8px;
-      font-size: 12px;
+      font-size: 11px;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-    }
-    .btn-admin-view:hover {
-      background: rgba(255, 255, 255, 0.2);
-      color: #fff;
+      text-decoration: none;
     }
   </style>
 </head>
@@ -191,7 +202,7 @@
         </div>
         <div class="brand-text">
           <h2>Shopee Affiliate</h2>
-          <span class="badge">PRO SUITE v2.0</span>
+          <span class="badge">PRO SUITE v2.5</span>
         </div>
       </div>
 
@@ -199,6 +210,10 @@
         <a href="#store-products" class="nav-item" data-tab="products">
           <i class="fa-solid fa-boxes-stacked"></i>
           <span>Quản Lý Kho Siêu Thị</span>
+        </a>
+        <a href="#analytics" class="nav-item" data-tab="analytics">
+          <i class="fa-solid fa-chart-column"></i>
+          <span>Thống Kê Analytics</span>
         </a>
         <a href="#single-convert" class="nav-item active" data-tab="single">
           <i class="fa-solid fa-link"></i>
@@ -258,7 +273,7 @@
     <!-- Main Content Area -->
     <main class="main-content">
       
-      <!-- TAB 0: QUẢN LÝ KHO SẢN PHẨM SIÊU THỊ (GIAO DIỆN THẺ SẢN PHẨM RỘNG RÃI) -->
+      <!-- TAB 0: QUẢN LÝ KHO SẢN PHẨM SIÊU THỊ -->
       <section id="tab-products" class="tab-content hidden">
         <div class="card">
           <div class="card-header flex-between" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
@@ -297,6 +312,64 @@
                 <i class="fa-solid fa-spinner fa-spin fa-2x"></i>
                 <p style="margin-top: 10px;">Đang nạp danh sách sản phẩm từ shop.saigoncacanh.com...</p>
               </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB ANALYTICS: THỐNG KÊ LƯỢT CLICK & BẢNG XẾP HẠNG TOP HOT -->
+      <section id="tab-analytics" class="tab-content hidden">
+        <div class="card">
+          <div class="card-header flex-between" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+            <div>
+              <h3 style="color: #38bdf8; font-size: 18px;"><i class="fa-solid fa-chart-column"></i> THỐNG KÊ & ANALYTICS CLICK SẢN PHẨM SIÊU THỊ</h3>
+              <p class="subtitle">Theo dõi lượt click MUA NAY real-time và danh sách Top sản phẩm HOT thu hút nhất.</p>
+            </div>
+            <button id="btn-refresh-analytics" class="btn btn-secondary btn-sm"><i class="fa-solid fa-rotate"></i> Cập Nhật Dữ Liệu</button>
+          </div>
+          
+          <div class="card-body">
+            <!-- Stat Cards Row -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px;">
+              <div style="background: rgba(255,255,255,0.05); padding: 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); text-align: center;">
+                <small style="color: #888; text-transform: uppercase; font-size: 11px; font-weight: 700;">Tổng Lượt Click Mua</small>
+                <div id="stat-total-clicks" style="font-size: 28px; font-weight: 800; color: #f97316; margin-top: 5px;">0</div>
+              </div>
+              <div style="background: rgba(255,255,255,0.05); padding: 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); text-align: center;">
+                <small style="color: #888; text-transform: uppercase; font-size: 11px; font-weight: 700;">Tổng Sản Phẩm Đang Có</small>
+                <div id="stat-total-prods" style="font-size: 28px; font-weight: 800; color: #38bdf8; margin-top: 5px;">0</div>
+              </div>
+              <div style="background: rgba(255,255,255,0.05); padding: 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); text-align: center;">
+                <small style="color: #888; text-transform: uppercase; font-size: 11px; font-weight: 700;">Món Đang Hot Nhất</small>
+                <div id="stat-top-item-name" style="font-size: 13px; font-weight: 700; color: #22c55e; margin-top: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Chưa có dữ liệu</div>
+              </div>
+            </div>
+
+            <!-- Chart Box -->
+            <div style="background: #181f2c; padding: 20px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.08); margin-bottom: 25px;">
+              <h4 style="margin-bottom: 15px; color: #f8fafc; font-size: 14px;"><i class="fa-solid fa-chart-line"></i> Biểu Đồ Lượt Click Mua Nay (7 Ngày Gần Nhất)</h4>
+              <div style="position: relative; height: 260px;">
+                <canvas id="clickChart"></canvas>
+              </div>
+            </div>
+
+            <!-- Top Products Ranking Table -->
+            <h4 style="margin-bottom: 12px; color: #f8fafc; font-size: 14px;"><i class="fa-solid fa-trophy" style="color: #eab308;"></i> Bảng Xếp Hạng TOP Sản Phẩm Được Quan Tâm Nhất</h4>
+            <div class="table-responsive" style="max-height: 400px; overflow-y: auto; border: 1px solid rgba(255,255,255,0.1); border-radius: 10px;">
+              <table class="table" style="width: 100%; border-collapse: collapse; text-align: left;">
+                <thead>
+                  <tr style="background: rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.1);">
+                    <th style="padding: 10px; width: 60px; text-align: center;">Hạng</th>
+                    <th style="padding: 10px; width: 60px;">Ảnh</th>
+                    <th style="padding: 10px;">Tên Sản Phẩm</th>
+                    <th style="padding: 10px; width: 120px;">Danh Mục</th>
+                    <th style="padding: 10px; width: 100px; text-align: center;">Lượt Click</th>
+                  </tr>
+                </thead>
+                <tbody id="analytics-top-body">
+                  <tr><td colspan="5" style="text-align: center; padding: 20px; color: #888;">Đang nạp dữ liệu thống kê...</td></tr>
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
@@ -640,12 +713,49 @@ if __name__ == '__main__':
     </main>
   </div>
 
+  <!-- MODAL: TẠO BÀI ĐĂNG SOCIAL 1-CLICK -->
+  <div id="modal-social-post" class="login-overlay hidden" style="z-index: 999;">
+    <div class="login-card" style="max-width: 580px; width: 92%; text-align: left;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">
+        <h3 style="color: #f97316; font-size: 16px; margin: 0;"><i class="fa-solid fa-wand-magic-sparkles"></i> KỊCH BẢN ĐĂNG BÀI SOCIAL 1-CLICK</h3>
+        <button id="btn-close-post-modal" style="background: none; border: none; color: #aaa; font-size: 20px; cursor: pointer;">×</button>
+      </div>
+
+      <div style="display: flex; gap: 12px; margin-bottom: 12px; align-items: center; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 10px;">
+        <img id="modal-post-img" src="" alt="Thumbnail" style="width: 55px; height: 55px; object-fit: cover; border-radius: 8px;">
+        <div>
+          <div id="modal-post-title" style="font-weight: 700; color: #fff; font-size: 13px; line-height: 1.3;"></div>
+          <small id="modal-post-price" style="color: #f43f5e; font-weight: 700; font-size: 12px;"></small>
+        </div>
+      </div>
+
+      <div class="form-group" style="margin-bottom: 10px;">
+        <label style="font-size: 12px;">Chọn Phong Cách Kịch Bản:</label>
+        <select id="modal-post-style" class="form-control" style="font-size: 13px;">
+          <option value="flash">🔥 Phong cách Flash Sale (Gấp gáp, giật gân)</option>
+          <option value="review">⭐ Phong cách Review Thật (Tin tưởng high-rating)</option>
+          <option value="short">📱 Phong cách Ngắn Gọn (Zalo / TikTok Bio)</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label style="font-size: 12px;">Nội Dung Bài Đăng (Sẵn sàng copy):</label>
+        <textarea id="modal-post-output" class="form-control code-textarea" rows="6" style="font-size: 12px; font-family: sans-serif;"></textarea>
+      </div>
+
+      <div style="display: flex; gap: 10px; margin-top: 15px;">
+        <button id="btn-copy-modal-post" class="btn btn-primary btn-block" style="flex: 2;"><i class="fa-regular fa-copy"></i> Sao Chép Toàn Bộ Bài Đăng</button>
+        <a id="modal-post-img-download" href="#" target="_blank" download="san-pham-shopee.jpg" class="btn btn-secondary" style="flex: 1; text-align: center; text-decoration: none; padding: 10px; font-size: 12px;"><i class="fa-solid fa-download"></i> Tải Ảnh</a>
+      </div>
+    </div>
+  </div>
+
   <!-- Toast Notification -->
   <div id="toast" class="toast hidden">
     <i class="fa-solid fa-circle-check"></i>
     <span id="toast-msg">Đã sao chép vào bộ nhớ tạm!</span>
   </div>
 
-  <script src="js/app.js?v=6.0"></script>
+  <script src="js/app.js?v=7.0"></script>
 </body>
 </html>

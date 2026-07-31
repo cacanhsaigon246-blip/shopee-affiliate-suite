@@ -118,6 +118,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (targetTab === 'products') {
         loadAdminProducts();
+      } else if (targetTab === 'analytics') {
+        loadAnalytics();
       }
 
       if (window.innerWidth <= 768 && sidebarNav) {
@@ -224,7 +226,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ==========================================
-  // STOREFRONT PRODUCT MANAGER - PRODUCT CARDS GRID LAYOUT
+  // STOREFRONT PRODUCT MANAGER - CARDS GRID LAYOUT
   // ==========================================
   let adminProducts = [];
   let currentAdminCategory = 'all';
@@ -309,15 +311,17 @@ document.addEventListener('DOMContentLoaded', () => {
           <button class="btn-admin-del btn-delete-single-admin" data-id="${item.id}" title="Xóa sản phẩm này">
             <i class="fa-solid fa-trash"></i> Xóa
           </button>
+          <button class="btn-admin-post btn-gen-post-admin" data-id="${item.id}" title="Tạo bài đăng Social 1-Click">
+            <i class="fa-solid fa-wand-magic-sparkles"></i> Đăng Bài
+          </button>
           <a href="${item.shopeeUrl}" target="_blank" class="btn-admin-view" title="Xem trên Shopee">
-            <i class="fa-solid fa-arrow-up-right-from-square"></i> Shopee
+            <i class="fa-solid fa-arrow-up-right-from-square"></i>
           </a>
         </div>
       `;
       adminCardsGrid.appendChild(card);
     });
 
-    // Attach checkbox listeners to toggle .selected style on card
     adminCardsGrid.querySelectorAll('.chk-admin-item').forEach(chk => {
       chk.addEventListener('change', () => {
         const cardParent = chk.closest('.admin-prod-card');
@@ -329,11 +333,19 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
 
-    // Attach single delete listener
     adminCardsGrid.querySelectorAll('.btn-delete-single-admin').forEach(btn => {
       btn.addEventListener('click', () => {
         const pId = btn.getAttribute('data-id');
         deleteSingleAdminProduct(pId);
+      });
+    });
+
+    // 1-CLICK SOCIAL POST GENERATOR TRIGGER
+    adminCardsGrid.querySelectorAll('.btn-gen-post-admin').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const pId = btn.getAttribute('data-id');
+        const item = adminProducts.find(p => p.id === pId);
+        if (item) openSocialPostModal(item);
       });
     });
   }
@@ -468,6 +480,183 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // ==========================================
+  // 1-CLICK SOCIAL POST GENERATOR MODAL
+  // ==========================================
+  const modalSocialPost = document.getElementById('modal-social-post');
+  const modalPostImg = document.getElementById('modal-post-img');
+  const modalPostTitle = document.getElementById('modal-post-title');
+  const modalPostPrice = document.getElementById('modal-post-price');
+  const modalPostStyle = document.getElementById('modal-post-style');
+  const modalPostOutput = document.getElementById('modal-post-output');
+  const btnClosePostModal = document.getElementById('btn-close-post-modal');
+  const btnCopyModalPost = document.getElementById('btn-copy-modal-post');
+  const modalPostImgDownload = document.getElementById('modal-post-img-download');
+
+  let currentPostItem = null;
+
+  function openSocialPostModal(item) {
+    currentPostItem = item;
+    modalPostImg.src = item.image || 'https://via.placeholder.com/150';
+    modalPostTitle.textContent = item.title;
+    modalPostPrice.textContent = item.price || 'Giá cực tốt';
+    modalPostImgDownload.href = item.image;
+
+    generatePostScript();
+    modalSocialPost.classList.remove('hidden');
+  }
+
+  function generatePostScript() {
+    if (!currentPostItem) return;
+    const style = modalPostStyle.value;
+    const title = currentPostItem.title;
+    const price = currentPostItem.price || 'Deal Ngon Shopee';
+    const affId = globalAffIdInput.value.trim() || '17384730538';
+    
+    const encoded = encodeURIComponent(currentPostItem.shopeeUrl);
+    const fullLink = `https://s.shopee.vn/an_redir?origin_link=${encoded}&affiliate_id=${affId}&sub_id=social-post`;
+    const b64 = btoa(unescape(encodeURIComponent(fullLink)))
+      .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    const shortLink = `https://shop.saigoncacanh.com/r.php?u=${b64}`;
+
+    let text = '';
+
+    if (style === 'flash') {
+      text = `🔥 DEAL CHỢP NHOÁNG - GIÁ SIÊU SỐC TRONG NGÀY! 🔥\n\n🐠 ${title}\n💰 Giá Sale Hot: ${price}\n\n🚀 Đặt mua giao nhanh tận nhà tại đây:\n👉 ${shortLink}\n\n⚡ Mã giảm giá & Freeship tự động áp dụng khi thanh toán!`;
+    } else if (style === 'review') {
+      text = `⭐ REVIEW SẢN PHẨM THỦY SINH ĐƯỢC ĐÁNH GIÁ 5 SAO ⭐\n\n👉 Anh em mê cá cảnh không nên bỏ qua món này: ${title}\n💵 Giá tốt nhất hôm nay: ${price}\n\n🛒 Link mua hàng chính hãng Shopee bên dưới:\n👉 ${shortLink}\n\n(Hàng chuẩn 100%, được kiểm tra trước khi nhận!)`;
+    } else {
+      text = `🐟 ${title}\n👉 Mua ngay tại Shopee: ${shortLink}\n💰 Giá cực mềm: ${price}`;
+    }
+
+    modalPostOutput.value = text;
+  }
+
+  if (modalPostStyle) {
+    modalPostStyle.addEventListener('change', generatePostScript);
+  }
+
+  if (btnClosePostModal) {
+    btnClosePostModal.addEventListener('click', () => {
+      modalSocialPost.classList.add('hidden');
+    });
+  }
+
+  if (btnCopyModalPost) {
+    btnCopyModalPost.addEventListener('click', () => {
+      if (modalPostOutput.value) {
+        navigator.clipboard.writeText(modalPostOutput.value);
+        showToast('Đã sao chép kịch bản bài đăng!');
+      }
+    });
+  }
+
+  // ==========================================
+  // ANALYTICS & CLICK STATS CHART ENGINE
+  // ==========================================
+  let clickChartInstance = null;
+  const statTotalClicks = document.getElementById('stat-total-clicks');
+  const statTotalProds = document.getElementById('stat-total-prods');
+  const statTopItemName = document.getElementById('stat-top-item-name');
+  const analyticsTopBody = document.getElementById('analytics-top-body');
+  const btnRefreshAnalytics = document.getElementById('btn-refresh-analytics');
+
+  async function loadAnalytics() {
+    if (!analyticsTopBody) return;
+    analyticsTopBody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 20px; color: #888;"><i class="fa-solid fa-spinner fa-spin"></i> Đang nạp thống kê từ shop.saigoncacanh.com...</td></tr>';
+
+    try {
+      const res = await fetch(`https://shop.saigoncacanh.com/get-analytics.php?v=${Date.now()}`);
+      if (res.ok) {
+        const json = await res.json();
+        if (json && json.success) {
+          renderAnalyticsData(json);
+        }
+      }
+    } catch(e) {
+      console.error('Analytics fetch error:', e);
+      analyticsTopBody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 20px; color: #ef4444;">Không thể kết nối máy chủ thống kê.</td></tr>';
+    }
+  }
+
+  function renderAnalyticsData(data) {
+    if (statTotalClicks) statTotalClicks.textContent = data.total_clicks || 0;
+    if (statTotalProds) statTotalProds.textContent = data.total_products || 0;
+
+    const topList = data.top_products || [];
+    if (statTopItemName) {
+      statTopItemName.textContent = topList.length > 0 ? topList[0].title : 'Chưa có dữ liệu';
+    }
+
+    // Draw Chart.js Line Chart
+    const ctx = document.getElementById('clickChart')?.getContext('2d');
+    if (ctx && data.chart) {
+      if (clickChartInstance) clickChartInstance.destroy();
+
+      clickChartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: data.chart.labels,
+          datasets: [{
+            label: 'Lượt Click Mua Nay',
+            data: data.chart.data,
+            borderColor: '#f97316',
+            backgroundColor: 'rgba(249, 115, 22, 0.15)',
+            borderWidth: 3,
+            fill: true,
+            tension: 0.4,
+            pointBackgroundColor: '#f97316',
+            pointRadius: 5
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false }
+          },
+          scales: {
+            x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#aaa' } },
+            y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#aaa' }, beginAtZero: true }
+          }
+        }
+      });
+    }
+
+    // Render Ranking Table
+    if (topList.length === 0) {
+      analyticsTopBody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 20px; color: #888;">Chưa có dữ liệu lượt click. Hãy chia sẻ Siêu thị để bắt đầu đếm click!</td></tr>';
+      return;
+    }
+
+    analyticsTopBody.innerHTML = '';
+    topList.forEach((item, idx) => {
+      const tr = document.createElement('tr');
+      tr.style.borderBottom = '1px solid rgba(255,255,255,0.05)';
+      
+      let medal = `<strong style="color: #aaa;">#${idx + 1}</strong>`;
+      if (idx === 0) medal = '🥇';
+      else if (idx === 1) medal = '🥈';
+      else if (idx === 2) medal = '🥉';
+
+      tr.innerHTML = `
+        <td style="padding: 10px; text-align: center; font-size: 16px;">${medal}</td>
+        <td style="padding: 10px;"><img src="${item.image}" alt="" style="width: 40px; height: 40px; object-fit: cover; border-radius: 6px;"></td>
+        <td style="padding: 10px; font-weight: 600; font-size: 13px; color: #fff;">${item.title}</td>
+        <td style="padding: 10px;"><span style="background: rgba(255,255,255,0.1); color: #38bdf8; padding: 2px 6px; border-radius: 10px; font-size: 11px;">${item.categoryName}</span></td>
+        <td style="padding: 10px; text-align: center; font-weight: 800; color: #f97316; font-size: 14px;">${item.clicks}</td>
+      `;
+      analyticsTopBody.appendChild(tr);
+    });
+  }
+
+  if (btnRefreshAnalytics) {
+    btnRefreshAnalytics.addEventListener('click', () => {
+      showToast('Đang làm mới thống kê...');
+      loadAnalytics();
+    });
+  }
+
   // Load products automatically if opening products tab directly
   if (window.location.hash === '#store-products') {
     navItems.forEach(n => n.classList.remove('active'));
@@ -477,5 +666,13 @@ document.addEventListener('DOMContentLoaded', () => {
       else pane.classList.add('hidden');
     });
     loadAdminProducts();
+  } else if (window.location.hash === '#analytics') {
+    navItems.forEach(n => n.classList.remove('active'));
+    document.querySelector('[data-tab="analytics"]')?.classList.add('active');
+    tabPanes.forEach(pane => {
+      if (pane.id === 'tab-analytics') pane.classList.remove('hidden');
+      else pane.classList.add('hidden');
+    });
+    loadAnalytics();
   }
 });

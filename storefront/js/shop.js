@@ -132,14 +132,21 @@ document.addEventListener('DOMContentLoaded', () => {
       emptyState.classList.add('hidden');
       productGrid.classList.remove('hidden');
 
-      filtered.forEach(item => {
+      filtered.forEach((item, idx) => {
         const affLink = getAffiliateLink(item.shopeeUrl, item.id, item.title);
         const card = document.createElement('div');
         card.className = 'product-card';
+        
+        // Dynamic promo badge tag for visual flair
+        let promoTag = item.discount || 'HOT';
+        if (idx % 3 === 0) promoTag = '🔥 TOP BÁN CHẠY';
+        else if (idx % 3 === 1) promoTag = '⚡ FLASH SALE';
+        else promoTag = '🚚 FREESHIP XTRA';
+
         card.innerHTML = `
           <div class="product-img-wrapper">
             <img src="${item.image}" alt="${item.title}" loading="lazy">
-            <span class="discount-tag">${item.discount}</span>
+            <span class="discount-tag">${promoTag}</span>
             <span class="shopee-badge"><i class="fa-solid fa-bag-shopping"></i> Shopee</span>
           </div>
           <div class="product-info">
@@ -150,7 +157,7 @@ document.addEventListener('DOMContentLoaded', () => {
               <span class="original-price">${item.originalPrice}</span>
             </div>
             <div class="product-actions">
-              <a href="${affLink}" target="_blank" class="btn-buy-shopee">
+              <a href="${affLink}" target="_blank" class="btn-buy-shopee" data-id="${item.id}">
                 <i class="fa-solid fa-bolt"></i> MUA NAY
               </a>
               <button class="btn-add-cart" data-id="${item.id}" title="Thêm vào danh sách mua">
@@ -160,6 +167,18 @@ document.addEventListener('DOMContentLoaded', () => {
           </div>
         `;
         productGrid.appendChild(card);
+      });
+
+      // Attach Buy Button Click Tracking
+      productGrid.querySelectorAll('.btn-buy-shopee').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const pId = btn.getAttribute('data-id');
+          if (pId) {
+            try {
+              fetch(`https://shop.saigoncacanh.com/track-click.php?id=${encodeURIComponent(pId)}`, { mode: 'no-cors' });
+            } catch(e) {}
+          }
+        });
       });
 
       // Attach Add Cart Listeners
