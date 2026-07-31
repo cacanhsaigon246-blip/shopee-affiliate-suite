@@ -89,8 +89,15 @@
 
 ### 🤖 3.5. Hệ Thống Tự Động Đăng Bài Facebook Fanpage (`SaigonCaCanh_AutoPost_Affiliate`)
 * **Kịch bản Node.js:** `E:\Backup_Ghi_Nho_Antigravity\Tu_Dong_Hoa_Facebook\auto_post_affiliate.js`
-* **Lịch Trình Tự Động:** Tích hợp Windows Task Scheduler chạy 2 lần/ngày (08:30 Sáng & 17:30 Chiều).
-* **Cơ Chế:** Tự nạp dữ liệu Siêu Thị, chọn sản phẩm HOT chưa đăng, tự động chuẩn hóa giá VND, bọc link ngắn `shop.saigoncacanh.com/r.php?u=...` kèm mã Affiliate ID `17384730538`, và đăng lên Fanpage `Sài Gòn Cá Cảnh - 246 Hồ Văn Huê` qua Meta Graph API.
+* **Tần Suất Đăng:** **16 Bài / Ngày** (Lịch trình mỗi 1 tiếng/lần từ 07:00 Sáng đến 22:00 Đêm).
+* **Cấu Hình Chạy Bù (`StartWhenAvailable`):** Nếu máy tính bật trễ, Windows Task Scheduler tự động đăng bù ngay khi mở máy!
+* **Bộ 5 Phong Cách Bài Đăng SEO Google (`buildCaption`):**
+  1. 🔥 *Flash Sale & Deal Hot Chớp Nhoáng*
+  2. 🔍 *Review & Đánh Giá Đồ Thủy Sinh*
+  3. 💡 *Mẹo Chăm Sóc Bể Cảnh & Phụ Kiện*
+  4. 🎁 *Mã Giảm Giá & Freeship Shopee*
+  5. 💬 *Gợi Ý Đồng Ngư Sài Gòn Cá Cảnh*
+* **Cơ Chế:** Tự nạp sản phẩm HOT chưa đăng, tự động chuẩn hóa giá VND, bọc link ngắn `shop.saigoncacanh.com/r.php?u=...` kèm mã Affiliate ID `17384730538`, và đăng lên Fanpage `Sài Gòn Cá Cảnh - 246 Hồ Văn Huê` qua Meta Graph API.
 
 ---
 
