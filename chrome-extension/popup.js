@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   btnConvert.addEventListener('click', async () => {
     const rawUrl = currentUrlInput.value;
-      const affId = affIdInput.value.trim() || '17384730538';
+    const affId = affIdInput.value.trim() || '17384730538';
 
     chrome.storage.local.set({ shopee_aff_id: affId });
 
@@ -76,40 +76,69 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
       }
 
-        const affId = affIdInput.value.trim() || '17384730538';
+      const affId = affIdInput.value.trim() || '17384730538';
       btnSyncPage.textContent = '⏳ Đang quét & đồng bộ...';
       btnSyncPage.disabled = true;
 
-      try {
-        // Send message to content script to scrape page
-        chrome.tabs.sendMessage(tab.id, { action: 'scrape_shopee_page', affId }, async (response) => {
-          if (response && response.success && response.products && response.products.length > 0) {
-            // Send directly to save-products.php
-            const fd = new FormData();
-            fd.append('payload', JSON.stringify({ mode: 'append', products: response.products }));
+      // Function to send scraped data to Hostinger save-products.php
+      async function sendDataToStorefront(products) {
+        try {
+          const fd = new FormData();
+          fd.append('payload', JSON.stringify({ mode: 'append', products: products }));
 
-            const saveRes = await fetch('https://shop.saigoncacanh.com/save-products.php?token=041188', {
-              method: 'POST',
-              body: fd
-            });
-            const saveJson = await saveRes.json();
+          const saveRes = await fetch('https://shop.saigoncacanh.com/save-products.php?token=041188', {
+            method: 'POST',
+            body: fd
+          });
+          const saveJson = await saveRes.json();
 
-            if (saveJson && saveJson.success) {
-              alert(`🎉 ĐÃ ĐỒNG BỘ THÀNH CÔNG ${response.products.length} SẢN PHẨM VỚI 100% ẢNH THẬT LÊN SHOP.SAIGONCACANH.COM!`);
-            } else {
-              alert('Có lỗi khi lưu lên máy chủ: ' + (saveJson ? saveJson.error : 'Lỗi mạng'));
-            }
+          if (saveJson && saveJson.success) {
+            alert(`🎉 ĐÃ ĐỒNG BỘ THÀNH CÔNG ${products.length} SẢN PHẨM VỚI 100% ẢNH THẬT LÊN SHOP.SAIGONCACANH.COM!`);
           } else {
-            alert('Không tìm thấy sản phẩm nào trên trang này. Hãy cuộn nhẹ trang web Shopee để ảnh tải xong rồi bấm lại nha anh!');
+            alert('Có lỗi khi lưu lên máy chủ: ' + (saveJson ? saveJson.error : 'Lỗi kết nối server'));
           }
+        } catch (err) {
+          alert('Lỗi kết nối tới shop.saigoncacanh.com: ' + err.message);
+        } finally {
           btnSyncPage.textContent = '📸 Đồng Bộ Trang Này Vào Siêu Thị';
           btnSyncPage.disabled = false;
-        });
-      } catch (err) {
-        alert('Lỗi: Hãy tải lại trang Shopee rồi bấm lại nút này nhé!');
-        btnSyncPage.textContent = '📸 Đồng Bộ Trang Này Vào Siêu Thị';
-        btnSyncPage.disabled = false;
+        }
       }
+
+      // Try sending message to content script
+      chrome.tabs.sendMessage(tab.id, { action: 'scrape_shopee_page', affId }, async (response) => {
+        if (chrome.runtime.lastError || !response) {
+          console.warn('Content script not injected yet, injecting dynamically...', chrome.runtime.lastError);
+          // Dynamically inject content.js if missing
+          try {
+            await chrome.scripting.executeScript({
+              target: { tabId: tab.id },
+              files: ['content.js']
+            });
+
+            // Retry message after injection
+            chrome.tabs.sendMessage(tab.id, { action: 'scrape_shopee_page', affId }, async (retryRes) => {
+              if (retryRes && retryRes.success && retryRes.products && retryRes.products.length > 0) {
+                await sendDataToStorefront(retryRes.products);
+              } else {
+                alert('Không tìm thấy sản phẩm nào trên trang này. Hãy cuộn nhẹ trang Shopee để ảnh tải xong rồi bấm lại nhé anh!');
+                btnSyncPage.textContent = '📸 Đồng Bộ Trang Này Vào Siêu Thị';
+                btnSyncPage.disabled = false;
+              }
+            });
+          } catch (e) {
+            alert('Không thể quét trang Shopee. Hãy bấm F5 làm mới trang Shopee rồi bấm lại nhé anh!');
+            btnSyncPage.textContent = '📸 Đồng Bộ Trang Này Vào Siêu Thị';
+            btnSyncPage.disabled = false;
+          }
+        } else if (response && response.success && response.products && response.products.length > 0) {
+          await sendDataToStorefront(response.products);
+        } else {
+          alert('Không tìm thấy sản phẩm nào trên trang này. Hãy cuộn nhẹ trang Shopee để ảnh tải xong rồi bấm lại nhé anh!');
+          btnSyncPage.textContent = '📸 Đồng Bộ Trang Này Vào Siêu Thị';
+          btnSyncPage.disabled = false;
+        }
+      });
     });
   }
 });
