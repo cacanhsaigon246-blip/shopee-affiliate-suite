@@ -55,33 +55,28 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 2800);
   }
 
-  // Build Affiliate Link (Converts offer IDs directly to public consumer item pages)
+  // Build Affiliate Link (Fixes invalid 0 shopid & preserves search keyword parameter)
   function getAffiliateLink(shopeeSearchOrUrl, productId, title) {
     if (!shopeeSearchOrUrl) return '#';
     
-    // Fix internal affiliate portal offer links
-    if (shopeeSearchOrUrl.includes('affiliate.shopee.vn')) {
-      const offerMatch = shopeeSearchOrUrl.match(/\/product_offer\/(\d+)/);
-      let targetUrl = '';
-      if (offerMatch) {
-        targetUrl = `https://shopee.vn/a-i.0.${offerMatch[1]}`;
-      } else {
-        const cleanTitle = title || 'phu kien ca canh';
-        targetUrl = `https://shopee.vn/search?keyword=${encodeURIComponent(cleanTitle.trim())}`;
-      }
-      const encoded = encodeURIComponent(targetUrl);
-      return `https://s.shopee.vn/an_redir?origin_link=${encoded}&affiliate_id=${AFFILIATE_ID}&sub_id=shop-supermarket-${productId}`;
-    }
-
+    // If link is already an affiliate short link, return directly
     if (shopeeSearchOrUrl.includes('r.php') || shopeeSearchOrUrl.includes('s.shopee.vn') || shopeeSearchOrUrl.includes('shope.ee') || shopeeSearchOrUrl.includes('ulvis.net')) {
       return shopeeSearchOrUrl;
     }
 
     let cleanUrl = shopeeSearchOrUrl;
     try { cleanUrl = decodeURIComponent(shopeeSearchOrUrl); } catch(e){}
-    const questionIdx = cleanUrl.indexOf('?');
-    if (questionIdx > -1) {
-      cleanUrl = cleanUrl.substring(0, questionIdx);
+
+    // Fix internal affiliate portal offer links or invalid 0 shopid links
+    if (cleanUrl.includes('affiliate.shopee.vn') || cleanUrl.includes('/a-i.0.') || !cleanUrl.includes('shopee.vn')) {
+      const cleanTitle = (title || 'phu kien ca canh').trim();
+      cleanUrl = `https://shopee.vn/search?keyword=${encodeURIComponent(cleanTitle)}`;
+    }
+
+    // Only strip extraParams tracking bloat, PRESERVE ?keyword= search query!
+    const extraIdx = cleanUrl.indexOf('extraParams=');
+    if (extraIdx > -1) {
+      cleanUrl = cleanUrl.substring(0, extraIdx - 1);
     }
 
     const encoded = encodeURIComponent(cleanUrl);
