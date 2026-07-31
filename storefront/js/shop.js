@@ -55,9 +55,24 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 2800);
   }
 
-  // Build Affiliate Link
+  // Build Affiliate Link (Prevents double wrapping if link is already an affiliate URL)
   function getAffiliateLink(shopeeSearchOrUrl, productId) {
-    const encoded = encodeURIComponent(shopeeSearchOrUrl);
+    if (!shopeeSearchOrUrl) return '#';
+    
+    // If link is already an affiliate short link (r.php, s.shopee.vn, shope.ee, ulvis.net), return directly
+    if (shopeeSearchOrUrl.includes('r.php') || shopeeSearchOrUrl.includes('s.shopee.vn') || shopeeSearchOrUrl.includes('shope.ee') || shopeeSearchOrUrl.includes('ulvis.net')) {
+      return shopeeSearchOrUrl;
+    }
+
+    // Clean URL to avoid double encoding (%25)
+    let cleanUrl = shopeeSearchOrUrl;
+    try { cleanUrl = decodeURIComponent(shopeeSearchOrUrl); } catch(e){}
+    const questionIdx = cleanUrl.indexOf('?');
+    if (questionIdx > -1) {
+      cleanUrl = cleanUrl.substring(0, questionIdx);
+    }
+
+    const encoded = encodeURIComponent(cleanUrl);
     return `https://s.shopee.vn/an_redir?origin_link=${encoded}&affiliate_id=${AFFILIATE_ID}&sub_id=shop-supermarket-${productId}`;
   }
 

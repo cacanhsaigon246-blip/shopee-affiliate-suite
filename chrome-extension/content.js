@@ -4,10 +4,20 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     const products = [];
     const affId = request.affId || '17384730538';
 
-    // 1. Helper function to create affiliate URL
+    // 1. Helper function to create clean affiliate URL (prevents double %25 encoding & strips extra tracking params)
     function makeAffUrl(rawUrl) {
-      const encUrl = encodeURIComponent(rawUrl);
-      const b64 = btoa(unescape(encodeURIComponent(`https://s.shopee.vn/an_redir?origin_link=${encUrl}&affiliate_id=${affId}`)))
+      let cleanUrl = rawUrl || '';
+      try { cleanUrl = decodeURIComponent(cleanUrl); } catch (e) {}
+
+      // Strip extra tracking query parameters
+      const qIdx = cleanUrl.indexOf('?');
+      if (qIdx > -1) {
+        cleanUrl = cleanUrl.substring(0, qIdx);
+      }
+
+      const encUrl = encodeURIComponent(cleanUrl);
+      const targetAffUrl = `https://s.shopee.vn/an_redir?origin_link=${encUrl}&affiliate_id=${affId}`;
+      const b64 = btoa(unescape(encodeURIComponent(targetAffUrl)))
         .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
       return `https://shop.saigoncacanh.com/r.php?u=${b64}`;
     }
