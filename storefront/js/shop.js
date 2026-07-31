@@ -29,6 +29,23 @@ document.addEventListener('DOMContentLoaded', () => {
   let searchQuery = '';
   let wishlist = [];
 
+  // Helper function to remove Vietnamese diacritics / tones for accent-insensitive search
+  function removeVietnameseTones(str) {
+    if (!str) return '';
+    str = str.toLowerCase();
+    str = str.replace(/à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ/g, 'a');
+    str = str.replace(/è|é|ẹ|ẻ|ẽ|ê|ề|ế|ệ|ể|ễ/g, 'e');
+    str = str.replace(/ì|í|ị|ỉ|ĩ/g, 'i');
+    str = str.replace(/ò|ó|ọ|ỏ|õ|ô|ồ|ố|ộ|ổ|ỗ|ơ|ờ|ớ|ợ|ở|ỡ/g, 'o');
+    str = str.replace(/ù|ú|ụ|ủ|ũ|ư|ừ|ứ|ự|ử|ữ/g, 'u');
+    str = str.replace(/ỳ|ý|ỵ|ỷ|ỹ/g, 'y');
+    str = str.replace(/đ/g, 'd');
+    try {
+      str = str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    } catch(e){}
+    return str;
+  }
+
   // Check URL parameters for fallback / broken link redirection
   const urlParams = new URLSearchParams(window.location.search);
   if (urlParams.has('fallback') || urlParams.has('broken') || urlParams.has('search')) {
@@ -89,16 +106,20 @@ document.addEventListener('DOMContentLoaded', () => {
     return PRODUCTS_DATA.filter(item => item.status === 'active');
   }
 
-  // Render Products Grid
+  // Render Products Grid with Smart Unaccented Vietnamese Search!
   function renderProducts() {
     const activeData = getActiveProducts();
+    const cleanSearchQuery = removeVietnameseTones(searchQuery);
     
     const filtered = activeData.filter(item => {
       const matchCat = currentCategory === 'all' || item.category === currentCategory;
-      const matchSearch = !searchQuery || 
-        item.title.toLowerCase().includes(searchQuery) || 
-        item.categoryName.toLowerCase().includes(searchQuery);
-      return matchCat && matchSearch;
+      if (!matchCat) return false;
+      if (!cleanSearchQuery) return true;
+
+      const titleClean = removeVietnameseTones(item.title);
+      const catClean = removeVietnameseTones(item.categoryName);
+
+      return titleClean.includes(cleanSearchQuery) || catClean.includes(cleanSearchQuery);
     });
 
     productGrid.innerHTML = '';
