@@ -268,27 +268,48 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnDeleteSelectedProducts = document.getElementById('btn-delete-selected-products');
   const btnPurgeStore = document.getElementById('btn-purge-store');
 
-  async function loadAdminProducts() {
+  const ADMIN_CACHE_KEY = 'cache_admin_products_v2';
+  let adminDisplayLimit = 36;
+
+  async function loadAdminProducts(forceRefresh = false) {
     if (!adminCardsGrid) return;
-    adminCardsGrid.innerHTML = `
-      <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #888;">
-        <i class="fa-solid fa-spinner fa-spin fa-2x"></i>
-        <p style="margin-top: 10px;">Đang nạp kho hàng từ shop.saigoncacanh.com...</p>
-      </div>
-    `;
     
-    try {
-      const res = await fetch(`https://shop.saigoncacanh.com/get-products.php?v=${Date.now()}`);
-      if (res.ok) {
-        adminProducts = await res.json();
-      } else {
-        adminProducts = [];
-      }
-    } catch(e) {
-      adminProducts = [];
+    // 1. INSTANT LOCAL CACHE RENDER (0.001s)
+    const cached = localStorage.getItem(ADMIN_CACHE_KEY);
+    if (cached && !forceRefresh) {
+      try {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          adminProducts = parsed;
+          renderAdminProducts();
+        }
+      } catch(e){}
     }
 
-    renderAdminProducts();
+    if (adminProducts.length === 0) {
+      adminCardsGrid.innerHTML = `
+        <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #888;">
+          <i class="fa-solid fa-spinner fa-spin fa-2x"></i>
+          <p style="margin-top: 10px;">Đang nạp kho hàng siêu tốc từ shop.saigoncacanh.com...</p>
+        </div>
+      `;
+    }
+    
+    try {
+      const res = await fetch('https://shop.saigoncacanh.com/get-products.php');
+      if (res.ok) {
+        const fresh = await res.json();
+        if (Array.isArray(fresh)) {
+          adminProducts = fresh;
+          localStorage.setItem(ADMIN_CACHE_KEY, JSON.stringify(fresh));
+          renderAdminProducts();
+        }
+      }
+    } catch(e) {
+      if (adminProducts.length === 0) {
+        adminCardsGrid.innerHTML = `<p style="grid-column: 1/-1; text-align: center; padding: 20px; color: #ef4444;">Không thể kết nối máy chủ. Vui lòng thử lại.</p>`;
+      }
+    }
   }
 
   function renderAdminProducts() {
@@ -318,8 +339,10 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
+    const sliced = filtered.slice(0, adminDisplayLimit);
+
     adminCardsGrid.innerHTML = '';
-    filtered.forEach((item) => {
+    sliced.forEach((item) => {
       const card = document.createElement('div');
       card.className = 'admin-prod-card';
       card.setAttribute('data-id', item.id);
@@ -346,6 +369,26 @@ document.addEventListener('DOMContentLoaded', () => {
       `;
       adminCardsGrid.appendChild(card);
     });
+
+    // Add Load More Button if more items exist
+    if (filtered.length > adminDisplayLimit) {
+      const loadMoreWrap = document.createElement('div');
+      loadMoreWrap.style.cssText = 'grid-column: 1 / -1; text-align: center; margin-top: 20px;';
+      loadMoreWrap.innerHTML = `
+        <button id="btn-admin-load-more" class="btn btn-secondary btn-lg" style="background: linear-gradient(135deg, #1e293b, #0f172a); border: 1px solid #38bdf8; color: #38bdf8; padding: 12px 28px; border-radius: 30px; font-weight: 700; cursor: pointer;">
+          <i class="fa-solid fa-angle-down"></i> Xem Thêm ${Math.min(36, filtered.length - adminDisplayLimit)} Sản Phẩm (Còn ${filtered.length - adminDisplayLimit} món)
+        </button>
+      `;
+      adminCardsGrid.appendChild(loadMoreWrap);
+
+      const btnAdminLoadMore = document.getElementById('btn-admin-load-more');
+      if (btnAdminLoadMore) {
+        btnAdminLoadMore.addEventListener('click', () => {
+          adminDisplayLimit += 36;
+          renderAdminProducts();
+        });
+      }
+    }
 
     adminCardsGrid.querySelectorAll('.chk-admin-item').forEach(chk => {
       chk.addEventListener('change', () => {
