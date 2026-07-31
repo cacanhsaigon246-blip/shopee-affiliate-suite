@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="css/style.css?v=2.5">
+  <link rel="stylesheet" href="css/style.css?v=2.6">
 </head>
 <body>
 
@@ -74,6 +74,10 @@
       </div>
 
       <nav class="nav-menu">
+        <a href="#store-products" class="nav-item" data-tab="products">
+          <i class="fa-solid fa-boxes-stacked"></i>
+          <span>Quản Lý Kho Siêu Thị</span>
+        </a>
         <a href="#single-convert" class="nav-item active" data-tab="single">
           <i class="fa-solid fa-link"></i>
           <span>Tạo Link Đơn</span>
@@ -123,257 +127,62 @@
             <input type="text" id="chrome-ext-id" placeholder="Dán ID Extension tại đây..." value="giiidopldjffcbabkhepanbmmngolbni">
           </div>
         </div>
-
-        <button class="btn btn-outline btn-lock-system" id="btn-lock-app">
-          <i class="fa-solid fa-lock"></i> Khóa Hệ Thống
+        <button id="btn-lock-app" class="btn btn-secondary btn-sm btn-block" style="margin-top: 10px;" title="Khóa ứng dụng ngay lập tức">
+          <i class="fa-solid fa-lock"></i> Đăng Xuất / Khóa Màn Hình
         </button>
       </div>
     </aside>
 
-    <!-- Overlay backdrop for mobile menu -->
-    <div id="mobile-menu-backdrop" class="mobile-backdrop hidden"></div>
-
     <!-- Main Content Area -->
     <main class="main-content">
-      <!-- Top Header -->
-      <header class="top-header">
-        <div class="header-title">
-          <h1 id="page-title">Tạo & Tối Ưu Link Tiếp Thị Liên Kết</h1>
-          <p id="page-desc">Chuyển đổi link Shopee nhanh chóng với UTM Tracking chuẩn xác và mã hóa an toàn.</p>
-        </div>
-        <div class="header-actions">
-          <button class="btn btn-outline" id="btn-change-pass">
-            <i class="fa-solid fa-key"></i> Đổi Mật Khẩu
-          </button>
-        </div>
-      </header>
-
-      <!-- TAB 1: SINGLE LINK CONVERTER -->
-      <section id="tab-single" class="tab-pane active">
-        <div class="card main-converter-card">
-          <div class="card-header">
-            <i class="fa-solid fa-wand-magic-sparkles"></i>
-            <h3>Công Cụ Chuyển Đổi Link Đơn</h3>
-          </div>
-          <div class="card-body">
-            <div class="form-group">
-              <label for="single-input-url">Link Sản Phẩm / Shop Shopee Gốc <span class="required">*</span></label>
-              <div class="input-with-icon">
-                <i class="fa-solid fa-link"></i>
-                <input type="url" id="single-input-url" placeholder="Dán link Shopee tại đây...">
-              </div>
-            </div>
-
-            <!-- Sub ID Fields Breakdown -->
-            <div class="subid-grid-header">
-              <h4>Gán Thẻ Theo Dõi Sub-ID (Tối đa 5 thẻ)</h4>
-              <span class="tooltip-info" title="Giúp phân loại nguồn traffic"><i class="fa-solid fa-circle-info"></i> Giải thích</span>
-            </div>
-
-            <div class="subid-grid">
-              <div class="subid-item">
-                <label for="sub1">Sub 1 (Nguồn)</label>
-                <input type="text" id="sub1" placeholder="facebook, tiktok...">
-              </div>
-              <div class="subid-item">
-                <label for="sub2">Sub 2 (Định Dạng)</label>
-                <input type="text" id="sub2" placeholder="reel, post...">
-              </div>
-              <div class="subid-item">
-                <label for="sub3">Sub 3 (Chiến Dịch)</label>
-                <input type="text" id="sub3" placeholder="sale99, payday...">
-              </div>
-              <div class="subid-item">
-                <label for="sub4">Sub 4 (Vị Trí/Mã SP)</label>
-                <input type="text" id="sub4" placeholder="sp01, top1...">
-              </div>
-              <div class="subid-item">
-                <label for="sub5">Sub 5 (Ghi Chú)</label>
-                <input type="text" id="sub5" placeholder="custom_note...">
-              </div>
-            </div>
-
-            <div class="form-actions">
-              <button class="btn btn-primary btn-lg" id="btn-convert-single">
-                <i class="fa-solid fa-bolt"></i> Chuyển Đổi & Rút Gọn Link
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Output Result Card -->
-        <div class="card result-card hidden" id="single-result-card">
-          <div class="card-header border-success">
-            <i class="fa-solid fa-circle-check text-success"></i>
-            <h3>Kết Quả Chuyển Đổi</h3>
-          </div>
-          <div class="card-body">
-            <div class="result-layout">
-              <div class="result-details">
-                <div class="result-group highlight-box">
-                  <label><i class="fa-solid fa-star text-warning"></i> Link Rút Gọn (Bảo Mật Tên Miền Dashboard):</label>
-                  <div class="copy-box">
-                    <input type="text" id="res-short-link" readonly class="text-primary font-weight-bold">
-                    <button class="btn btn-primary btn-copy" data-target="res-short-link"><i class="fa-regular fa-copy"></i> Copy Ngay</button>
-                  </div>
-                </div>
-
-                <div class="result-group">
-                  <label>Link Affiliate Shopee Gốc Đầy Đủ:</label>
-                  <div class="copy-box">
-                    <input type="text" id="res-full-link" readonly>
-                    <button class="btn btn-copy" data-target="res-full-link"><i class="fa-regular fa-copy"></i> Copy</button>
-                  </div>
-                </div>
-
-                <div class="result-group">
-                  <label>Link Mã Hóa Origin:</label>
-                  <small id="res-encoded-origin" class="code-preview"></small>
-                </div>
-              </div>
-
-              <div class="qr-preview-box">
-                <h4>Mã QR Code</h4>
-                <div id="qr-code-img-container">
-                  <img id="qr-code-img" src="" alt="QR Code Link Affiliate">
-                </div>
-                <a id="download-qr-btn" href="#" download="shopee-qr.png" class="btn btn-sm btn-outline"><i class="fa-solid fa-download"></i> Tải Mã QR</a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- TAB 2: BULK CONVERTER -->
-      <section id="tab-bulk" class="tab-pane">
+      
+      <!-- TAB 0: QUẢN LÝ KHO SẢN PHẨM SIÊU THỊ -->
+      <section id="tab-products" class="tab-content hidden">
         <div class="card">
-          <div class="card-header">
-            <i class="fa-solid fa-list-check"></i>
-            <h3>Chuyển Đổi Link Shopee Hàng Loạt</h3>
+          <div class="card-header flex-between" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+            <div>
+              <h3><i class="fa-solid fa-boxes-stacked"></i> QUẢN LÝ KHO SẢN PHẨM SIÊU THỊ (shop.saigoncacanh.com)</h3>
+              <p class="subtitle">Tự động đồng bộ 2 chiều với Cửa hàng Siêu thị. Quản lý, xóa bớt sản phẩm rác hoặc phân loại danh mục sản phẩm.</p>
+            </div>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+              <button id="btn-reload-admin-products" class="btn btn-secondary btn-sm"><i class="fa-solid fa-rotate"></i> Tải Lại Kho</button>
+              <button id="btn-delete-selected-products" class="btn btn-danger btn-sm"><i class="fa-solid fa-trash-can"></i> Xóa Đã Chọn (<span id="selected-count">0</span>)</button>
+              <button id="btn-purge-store" class="btn btn-danger btn-sm" style="background: #dc2626;"><i class="fa-solid fa-dumpster"></i> Xóa Sạch Kho</button>
+            </div>
           </div>
+          
           <div class="card-body">
-            <div class="form-group">
-              <label for="bulk-input-text">Nhập Danh Sách Link Shopee Gốc (Mỗi link 1 dòng):</label>
-              <textarea id="bulk-input-text" rows="5" placeholder="https://shopee.vn/product/111/222&#10;https://shopee.vn/product/333/444"></textarea>
-            </div>
-
-            <div class="form-row">
-              <div class="form-group col-6">
-                <label for="bulk-sub1">Gán Nguồn Chung (Sub 1):</label>
-                <input type="text" id="bulk-sub1" placeholder="facebook_group">
+            <!-- Filter Bar & Search -->
+            <div style="display: flex; gap: 12px; margin-bottom: 15px; flex-wrap: wrap; align-items: center;">
+              <div style="flex: 1; min-width: 250px; position: relative;">
+                <input type="text" id="admin-search-input" class="form-control" placeholder="🔍 Tìm kiếm sản phẩm trong kho (gõ có dấu hoặc không dấu)..." style="width: 100%; padding-right: 30px;">
+                <button id="btn-clear-admin-search" class="hidden" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #aaa; cursor: pointer;">×</button>
               </div>
-              <div class="form-group col-6">
-                <label for="bulk-sub2">Gán Chiến Dịch (Sub 2):</label>
-                <input type="text" id="bulk-sub2" placeholder="sale_payday">
-              </div>
-            </div>
-
-            <button class="btn btn-primary btn-lg" id="btn-convert-bulk">
-              <i class="fa-solid fa-layer-group"></i> Xử Lý Chuyển Đổi Hàng Loạt
-            </button>
-
-            <!-- Table Results -->
-            <div class="bulk-results-section hidden" id="bulk-results-section">
-              <div class="table-actions">
-                <h4>Kết quả chuyển đổi (<span id="bulk-count">0</span> link)</h4>
-                <div class="btn-group">
-                  <button class="btn btn-outline" id="btn-copy-all-short"><i class="fa-regular fa-copy"></i> Copy Tất Cả Link Ngắn</button>
-                  <button class="btn btn-success" id="btn-export-csv"><i class="fa-solid fa-file-excel"></i> Xuất Excel / CSV</button>
-                  <button class="btn btn-warning" id="btn-scan-images" style="color: #000; font-weight: bold;"><i class="fa-solid fa-camera"></i> Quét Ảnh & Đồng Bộ Siêu Thị</button>
-                </div>
-              </div>
-
-              <!-- Progress Bar Scan Box -->
-              <div id="scan-progress-box" class="scan-progress-container hidden" style="margin-top: 15px; margin-bottom: 20px; padding: 15px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px;">
-                <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.9rem;">
-                  <span id="scan-progress-status" style="color: #f59e0b; font-weight: bold;"><i class="fa-solid fa-spinner fa-spin"></i> Đang chuẩn bị quét ảnh...</span>
-                  <span id="scan-progress-percent" style="font-weight: bold;">0%</span>
-                </div>
-                <div style="width: 100%; height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden;">
-                  <div id="scan-progress-bar" style="width: 0%; height: 100%; background: #f59e0b; transition: width 0.3s ease;"></div>
-                </div>
-              </div>
-
-              <div class="table-responsive">
-                <table class="table" id="bulk-table">
-                  <thead>
-                    <tr>
-                      <th>STT</th>
-                      <th>Link Gốc Shopee</th>
-                      <th>Link Affiliate Rút Gọn</th>
-                      <th>Sub ID</th>
-                      <th>Hành Động</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <!-- Dynamic Rows -->
-                  </tbody>
-                </table>
+              <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                <button class="btn btn-sm admin-cat-pill active" data-cat="all">Tất Cả (<span id="total-admin-count">0</span>)</button>
+                <button class="btn btn-sm admin-cat-pill" data-cat="thuc-an">Thức Ăn</button>
+                <button class="btn btn-sm admin-cat-pill" data-cat="bom-loc">Bơm & Lọc</button>
+                <button class="btn btn-sm admin-cat-pill" data-cat="den-led">Đèn LED</button>
+                <button class="btn btn-sm admin-cat-pill" data-cat="thuoc-men">Thuốc & Men</button>
+                <button class="btn btn-sm admin-cat-pill" data-cat="phu-kien">Phụ Kiện Bể Cá</button>
               </div>
             </div>
-          </div>
-        </div>
-      </section>
 
-      <!-- TAB 3: MẪU BÀI ĐĂNG SOCIAL TEMPLATES -->
-      <section id="tab-template" class="tab-pane">
-        <div class="card">
-          <div class="card-header">
-            <i class="fa-solid fa-pen-to-square"></i>
-            <h3>Tự Động Tạo Content Bài Đăng Săn Mã / Đăng Bài</h3>
-          </div>
-          <div class="card-body">
-            <div class="form-group">
-              <label for="tpl-select">Chọn Mẫu Bài Đăng Gợi Ý:</label>
-              <select id="tpl-select" class="form-select">
-                <option value="hot">🔥 Mẫu Săn Mã Giảm Giá Sốc (Hot Deals)</option>
-                <option value="flash">⚡ Mẫu Khung Giờ Flash Sale 0H</option>
-                <option value="review">⭐ Mẫu Đánh Giá / Review Sản Phẩm</option>
-                <option value="group">📢 Mẫu Đăng Nhóm / Fanpage Zalo & Facebook</option>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label for="tpl-link-input">Dán Link Rút Gọn Đã Tạo Vào Bài Đăng:</label>
-              <input type="url" id="tpl-link-input" placeholder="https://tinyurl.com/xyz (Tự động lấy link vừa tạo)">
-            </div>
-
-            <div class="form-group">
-              <label for="tpl-output">Bài Đăng Hoàn Chỉnh (Có thể chỉnh sửa thêm):</label>
-              <textarea id="tpl-output" rows="8"></textarea>
-            </div>
-
-            <button class="btn btn-primary btn-lg" id="btn-copy-template">
-              <i class="fa-regular fa-copy"></i> Sao Chép Bài Đăng Hoàn Chỉnh
-            </button>
-          </div>
-        </div>
-      </section>
-
-      <!-- TAB 4: LỊCH SỬ CHUYỂN ĐỔI (HISTORY) -->
-      <section id="tab-history" class="tab-pane">
-        <div class="card">
-          <div class="card-header">
-            <i class="fa-solid fa-clock-rotate-left"></i>
-            <h3>Lịch Sử Chuyển Đổi Link Gần ĐÂY</h3>
-            <button class="btn btn-sm btn-outline text-danger" id="btn-clear-history" style="margin-left: auto;">
-              <i class="fa-solid fa-trash-can"></i> Xóa Lịch Sử
-            </button>
-          </div>
-          <div class="card-body">
-            <div class="table-responsive">
-              <table class="table" id="history-table">
+            <!-- Products Table -->
+            <div class="table-responsive" style="max-height: 600px; overflow-y: auto; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px;">
+              <table class="table" style="width: 100%; border-collapse: collapse; text-align: left;">
                 <thead>
-                  <tr>
-                    <th>Thời Gian</th>
-                    <th>Link Shopee Gốc</th>
-                    <th>Link Affiliate Rút Gọn</th>
-                    <th>Sub ID</th>
-                    <th>Hành Động</th>
+                  <tr style="background: rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.1);">
+                    <th style="padding: 10px; width: 40px; text-align: center;"><input type="checkbox" id="chk-select-all-admin"></th>
+                    <th style="padding: 10px; width: 70px;">Hình Ảnh</th>
+                    <th style="padding: 10px;">Tên Sản Phẩm</th>
+                    <th style="padding: 10px; width: 140px;">Kệ Hàng / Danh Mục</th>
+                    <th style="padding: 10px; width: 100px;">Giá Bán</th>
+                    <th style="padding: 10px; width: 120px; text-align: center;">Thao Tác</th>
                   </tr>
                 </thead>
-                <tbody id="history-tbody">
-                  <!-- Dynamic Rows -->
+                <tbody id="admin-product-table-body">
+                  <tr><td colspan="6" style="text-align: center; padding: 20px; color: #888;">Đang tải danh sách kho hàng...</td></tr>
                 </tbody>
               </table>
             </div>
@@ -381,56 +190,242 @@
         </div>
       </section>
 
-      <!-- TAB 5: SUB-ID MATRIX CONFIG -->
-      <section id="tab-matrix" class="tab-pane">
+      <!-- TAB 1: TẠO LINK ĐƠN -->
+      <section id="tab-single" class="tab-content">
         <div class="card">
           <div class="card-header">
-            <i class="fa-solid fa-tags"></i>
-            <h3>Cấu Hình Chuẩn Hóa Mã Tracking Sub-ID</h3>
+            <h3><i class="fa-solid fa-wand-magic-sparkles"></i> Chuyển Đổi Link Shopee Đơn Lẻ</h3>
+            <p class="subtitle">Tự động gắn Affiliate ID và 5 tham số theo dõi Sub-ID cho 1 sản phẩm.</p>
           </div>
           <div class="card-body">
-            <p>Hệ thống hỗ trợ 5 trường Sub-ID nối với nhau bằng dấu gạch ngang (`-`). Dưới đây là mẫu quy chuẩn tối ưu nhất để tracking doanh số Affiliate:</p>
-            
-            <div class="matrix-grid">
-              <div class="matrix-card">
-                <span class="tag-badge">Sub 1</span>
-                <h4>Channel / Nguồn Traffic</h4>
-                <ul>
-                  <li><code>facebook</code>: Bài viết Facebook</li>
-                  <li><code>tiktok</code>: Link Bio TikTok</li>
-                  <li><code>zalo</code>: Nhóm Zalo Săn Mã</li>
-                  <li><code>telegram</code>: Kênh Telegram</li>
-                </ul>
+            <form id="single-form">
+              <div class="form-group">
+                <label for="single-input-url">Đường Dẫn Shopee Gốc (URL):</label>
+                <input type="url" id="single-input-url" class="form-control" placeholder="https://shopee.vn/product/12345/67890..." required>
               </div>
 
-              <div class="matrix-card">
-                <span class="tag-badge">Sub 2</span>
-                <h4>Định Dạng Nội Dung</h4>
-                <ul>
-                  <li><code>post</code>: Bài viết thông thường</li>
-                  <li><code>reel</code>: Video ngắn / Reels</li>
-                  <li><code>story</code>: Tin / Story 24h</li>
-                  <li><code>bio</code>: Trang tổng hợp link</li>
-                </ul>
+              <div class="grid-2-col">
+                <div class="form-group">
+                  <label for="single-sub1">Kênh Quảng Bá (Sub-ID 1):</label>
+                  <select id="single-sub1" class="form-control">
+                    <option value="facebook_page">Facebook Page</option>
+                    <option value="facebook_group">Facebook Group</option>
+                    <option value="tiktok_bio">TikTok Bio</option>
+                    <option value="youtube_short">YouTube Shorts</option>
+                    <option value="zalo_oa">Zalo OA / Chat</option>
+                    <option value="website_blog">Website / Blog</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="single-sub2">Tên Chiến Dịch (Sub-ID 2):</label>
+                  <input type="text" id="single-sub2" class="form-control" placeholder="Ví dụ: flash_sale_88, pay_day" value="campaign_hot">
+                </div>
               </div>
 
-              <div class="matrix-card">
-                <span class="tag-badge">Sub 3</span>
-                <h4>Tên Chiến Dịch</h4>
-                <ul>
-                  <li><code>sale99</code>: Ngày đôi 9/9</li>
-                  <li><code>payday</code>: Luơng về giữa/cuối tháng</li>
-                  <li><code>sanma</code>: Khung giờ săn mã 0H</li>
+              <button type="submit" id="btn-single-convert" class="btn btn-primary btn-block">
+                <i class="fa-solid fa-bolt"></i> Xử Lý & Tạo Link Affiliate
+              </button>
+            </form>
+
+            <div id="single-result-box" class="result-card hidden mt-4">
+              <div class="result-header">
+                <i class="fa-solid fa-circle-check"></i> Tạo Link Thành Công!
+              </div>
+              <div class="result-body">
+                <div class="form-group">
+                  <label>Link Affiliate Shopee Chuẩn (Có Sub-ID):</label>
+                  <div class="input-with-btn">
+                    <input type="text" id="single-res-full" class="form-control" readonly>
+                    <button class="btn btn-secondary btn-copy" data-target="single-res-full"><i class="fa-regular fa-copy"></i> Sao chép</button>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label>Link Rút Gọn Siêu Tốc (Nội Bộ shop.saigoncacanh.com):</label>
+                  <div class="input-with-btn">
+                    <input type="text" id="single-res-short" class="form-control" readonly>
+                    <button class="btn btn-success btn-copy" data-target="single-res-short"><i class="fa-regular fa-copy"></i> Sao chép ngắn</button>
+                  </div>
+                </div>
+
+                <div class="qr-container">
+                  <div id="single-qr-code" class="qr-box"></div>
+                  <small>Quét mã QR để mở link trên điện thoại</small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 2: CHUYỂN ĐỔI HÀNG LOẠT -->
+      <section id="tab-bulk" class="tab-content hidden">
+        <div class="card">
+          <div class="card-header">
+            <h3><i class="fa-solid fa-list-check"></i> Chuyển Đổi Link Shopee Hàng Loạt</h3>
+            <p class="subtitle">Xử lý hàng chục link Shopee cùng lúc, hỗ trợ xuất file Excel hoặc sao chép nhanh.</p>
+          </div>
+          <div class="card-body">
+            <div class="form-group">
+              <label for="bulk-input-urls">Nhập Danh Sách Link Shopee Gốc (Mỗi link 1 dòng):</label>
+              <textarea id="bulk-input-urls" class="form-control code-textarea" rows="6" placeholder="https://shopee.vn/product/111/222&#10;https://shopee.vn/product/333/444"></textarea>
+            </div>
+
+            <div class="grid-2-col">
+              <div class="form-group">
+                <label for="bulk-sub1">Gán Nguồn Chung (Sub 1):</label>
+                <input type="text" id="bulk-sub1" class="form-control" value="facebook_group">
+              </div>
+              <div class="form-group">
+                <label for="bulk-sub2">Gán Chiến Dịch (Sub 2):</label>
+                <input type="text" id="bulk-sub2" class="form-control" value="sale_payday">
+              </div>
+            </div>
+
+            <button id="btn-bulk-convert" class="btn btn-primary btn-block">
+              <i class="fa-solid fa-gears"></i> Xử Lý Chuyển Đổi Hàng Loạt
+            </button>
+
+            <div id="bulk-result-section" class="hidden mt-4">
+              <div class="flex-between mb-2">
+                <span class="count-badge"><i class="fa-solid fa-list"></i> Tổng số: <strong id="bulk-count">0</strong> link</span>
+                <div class="btn-group">
+                  <button id="btn-copy-all-bulk" class="btn btn-secondary btn-sm"><i class="fa-regular fa-copy"></i> Copy Tất Cả Link Ngắn</button>
+                  <button id="btn-export-excel" class="btn btn-success btn-sm"><i class="fa-solid fa-file-excel"></i> Xuất File Excel</button>
+                </div>
+              </div>
+              
+              <div class="table-responsive">
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th>STT</th>
+                      <th>Link Gốc</th>
+                      <th>Link Affiliate Rút Gọn</th>
+                      <th>Thao Tác</th>
+                    </tr>
+                  </thead>
+                  <tbody id="bulk-table-body"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 3: MẪU BÀI ĐĂNG SOCIAL -->
+      <section id="tab-template" class="tab-content hidden">
+        <div class="card">
+          <div class="card-header">
+            <h3><i class="fa-solid fa-pen-to-square"></i> Tạo Mẫu Bài Đăng Social (Facebook / Zalo / Telegram)</h3>
+            <p class="subtitle">Ghép link Affiliate vào kịch bản nội dung thu hút để chốt đơn nhanh chóng.</p>
+          </div>
+          <div class="card-body">
+            <div class="grid-2-col">
+              <div class="form-group">
+                <label for="tpl-title">Tên Sản Phẩm / Tiêu Đề Deal:</label>
+                <input type="text" id="tpl-title" class="form-control" placeholder="Ví dụ: Đèn LED Thủy Sinh Đổi Màu Cao Cấp">
+              </div>
+              <div class="form-group">
+                <label for="tpl-price">Giá Khuyến Mãi / Deal Hot:</label>
+                <input type="text" id="tpl-price" class="form-control" placeholder="Ví dụ: Chỉ 149.000đ (Giá gốc 250.000đ)">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="tpl-link">Link Affiliate Đã Rút Gọn:</label>
+              <input type="url" id="tpl-link" class="form-control" placeholder="https://shop.saigoncacanh.com/r.php?u=...">
+            </div>
+
+            <div class="form-group">
+              <label for="tpl-style">Chọn Phong Cách Bài Đăng:</label>
+              <select id="tpl-style" class="form-control">
+                <option value="hot_deal">🔥 Phong cách Flash Sale (Gấp gáp, giật gân)</option>
+                <option value="review">⭐ Phong cách Review Đánh Giá Thật</option>
+                <option value="short">📱 Phong cách Ngắn Gọn (Zalo / TikTok Bio)</option>
+              </select>
+            </div>
+
+            <button id="btn-generate-template" class="btn btn-primary btn-block">
+              <i class="fa-solid fa-sparkles"></i> Tạo Kịch Bản Nội Dung Bài Đăng
+            </button>
+
+            <div id="tpl-result-box" class="hidden mt-4">
+              <label>Kịch Bản Hoàn Chỉnh (Sẵn sàng copy đăng bài):</label>
+              <textarea id="tpl-output" class="form-control code-textarea" rows="7"></textarea>
+              <button id="btn-copy-template" class="btn btn-success btn-block mt-2">
+                <i class="fa-regular fa-copy"></i> Sao Chép Toàn Bộ Bài Đăng
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 4: LỊCH SỬ CHUYỂN ĐỔI -->
+      <section id="tab-history" class="tab-content hidden">
+        <div class="card">
+          <div class="card-header flex-between">
+            <div>
+              <h3><i class="fa-solid fa-clock-rotate-left"></i> Lịch Sử Chuyển Đổi Link</h3>
+              <p class="subtitle">Lưu trữ 50 link gần nhất được tạo trên thiết bị này.</p>
+            </div>
+            <button id="btn-clear-history" class="btn btn-danger btn-sm"><i class="fa-solid fa-trash"></i> Xóa Lịch Sử</button>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Thời Gian</th>
+                    <th>Link Gốc</th>
+                    <th>Link Affiliate</th>
+                    <th>Sub-ID</th>
+                    <th>Thao Tác</th>
+                  </tr>
+                </thead>
+                <tbody id="history-table-body">
+                  <tr><td colspan="5" class="text-center">Chưa có lịch sử chuyển đổi.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 5: CẤU HÌNH SUB-ID MATRIX -->
+      <section id="tab-matrix" class="tab-content hidden">
+        <div class="card">
+          <div class="card-header">
+            <h3><i class="fa-solid fa-tags"></i> Cấu Hình Ma Trận Sub-ID Tracking</h3>
+            <p class="subtitle">Quản lý các danh mục phân loại để theo dõi nguồn doanh thu chi tiết từ Shopee Analytics.</p>
+          </div>
+          <div class="card-body">
+            <div class="info-alert">
+              <i class="fa-solid fa-circle-info"></i>
+              <div>
+                <strong>Cấu trúc Sub-ID chuẩn của Shopee (tối đa 5 Sub-ID):</strong><br>
+                <code>sub_id = [Kênh Quảng Bá] - [Chiến Dịch] - [Dạng Nội Dung] - [Vị Trí] - [Mã Nhận Diện]</code>
+              </div>
+            </div>
+
+            <div class="grid-2-col mt-4">
+              <div>
+                <h4>Sub-ID 1: Kênh Quảng Bá (Source)</h4>
+                <ul class="sub-list">
+                  <li><code>facebook_page</code> - Fanpage Sài Gòn Cá Cảnh</li>
+                  <li><code>facebook_group</code> - Hội Nhóm Thủy Sinh</li>
+                  <li><code>tiktok_bio</code> - Link Bio Trang TikTok</li>
+                  <li><code>youtube_short</code> - Kênh YouTube Shorts</li>
+                  <li><code>zalo_oa</code> - Nhóm Zalo Khách Hàng</li>
                 </ul>
               </div>
-
-              <div class="matrix-card">
-                <span class="tag-badge">Sub 4 & 5</span>
-                <h4>Định Danh Tùy Biến</h4>
-                <ul>
-                  <li><code>sp01</code>: Mã ID sản phẩm cụ thể</li>
-                  <li><code>nhom1</code>: Tên nhóm/fanpage đăng</li>
-                  <li><code>kols_a</code>: Mã Publisher cộng tác</li>
+              <div>
+                <h4>Sub-ID 2: Loại Chiến Dịch (Campaign)</h4>
+                <ul class="sub-list">
+                  <li><code>sale_payday</code> - Khuyến mãi Lương Về</li>
+                  <li><code>sale_double_day</code> - Siêu sale ngày đôi (8.8, 9.9)</li>
+                  <li><code>flash_sale</code> - Deal chớp nhoáng hàng ngày</li>
+                  <li><code>koc_collection</code> - Bộ sưu tập KOC chọn lọc</li>
                 </ul>
               </div>
             </div>
@@ -438,90 +433,76 @@
         </div>
       </section>
 
-      <!-- TAB 6: CHROME EXTENSION -->
-      <section id="tab-chrome" class="tab-pane">
+      <!-- TAB 6: CHROME EXTENSION GUIDE -->
+      <section id="tab-chrome" class="tab-content hidden">
         <div class="card">
           <div class="card-header">
-            <i class="fa-brands fa-chrome text-primary"></i>
-            <h3>Tiện Ích Trình Duyệt Chrome Extension (1-Click)</h3>
+            <h3><i class="fa-brands fa-chrome"></i> Hướng Dẫn Cài Đặt Chrome Extension v2.3.3</h3>
+            <p class="subtitle">Tiện ích mở rộng tạo link 1-Click & Đồng bộ siêu tốc 64+ sản phẩm từ Shopee vào Siêu Thị.</p>
           </div>
           <div class="card-body">
-            <div class="ext-download-box">
-              <div class="ext-icon">
-                <i class="fa-brands fa-chrome"></i>
-              </div>
-              <div class="ext-info">
-                <h4>Shopee Affiliate Quick Converter Extension</h4>
-                <p>Tiện ích mở rộng giúp bạn tạo link rút gọn ngay khi đang xem sản phẩm Shopee trên máy tính.</p>
-                <div class="code-location">Mã nguồn nằm trong thư mục: <code>chrome-extension/</code></div>
-              </div>
-            </div>
-
-            <h4>Hướng dẫn cài đặt Chrome Extension trong 3 bước:</h4>
-            <ol class="steps-list">
-              <li>Mở trình duyệt Google Chrome và truy cập đường dẫn: <code>chrome://extensions/</code></li>
-              <li>Bật chế độ **Developer mode (Chế độ dành cho nhà phát triển)** ở góc trên bên phải.</li>
-              <li>Nhấn nút **Load unpacked (Tải tiện ích đã giải nén)** và chọn thư mục: <br><code>C:\Users\SAIGONCACANH\.gemini\antigravity\scratch\shopee-affiliate-suite\chrome-extension</code></li>
+            <ol class="step-list">
+              <li>Tải thư mục <code>chrome-extension/</code> trong mã nguồn của bạn về máy tính.</li>
+              <li>Mở trình duyệt Google Chrome hoặc Cốc Cốc, truy cập đường dẫn: <code>chrome://extensions/</code></li>
+              <li>Bật công tắc <strong>"Chế độ dành cho nhà phát triển" (Developer Mode)</strong> ở góc trên bên phải.</li>
+              <li>Bấm nút <strong>"Tải tiện ích đã giải nén" (Load unpacked)</strong> và chọn thư mục <code>chrome-extension/</code>.</li>
+              <li>Khi lướt Shopee, mở Extension và bấm nút vàng <strong>"📸 Đồng Bố Trang Này Vào Siêu Thị"</strong>.</li>
             </ol>
           </div>
         </div>
       </section>
 
       <!-- TAB 7: GOOGLE SHEETS SCRIPT -->
-      <section id="tab-sheets" class="tab-pane">
+      <section id="tab-sheets" class="tab-content hidden">
         <div class="card">
           <div class="card-header">
-            <i class="fa-solid fa-table text-success"></i>
-            <h3>Tự Động Hóa Trực Tiếp Trên Google Sheets</h3>
+            <h3><i class="fa-solid fa-table"></i> Tích Hợp Google Sheets (Mã Nguồn Apps Script)</h3>
+            <p class="subtitle">Sử dụng hàm <code>=CREATE_SHOPEE_AFF(url, sub1, sub2)</code> trực tiếp trên Bảng tính.</p>
           </div>
           <div class="card-body">
-            <p>Dán đoạn mã **Google Apps Script** dưới đây vào Google Sheets của bạn để dùng hàm tự động `=SHOPEE_AFF(A2, "facebook", "post")`:</p>
-            
+            <p>Dán đoạn mã sau vào menu <strong>Tiện ích mở rộng > Apps Script</strong> trong Google Sheets của bạn:</p>
             <div class="code-box-wrapper">
-              <button class="btn btn-sm btn-copy-code" data-target="gs-code"><i class="fa-regular fa-copy"></i> Sao chép Mã AppScript</button>
+              <button class="btn btn-sm btn-copy-code" data-target="gs-code"><i class="fa-regular fa-copy"></i> Sao chép Mã Apps Script</button>
               <pre><code id="gs-code">/**
- * Hàm tự động tạo Link Affiliate Shopee chuẩn trong Google Sheets
- * Cú pháp: =SHOPEE_AFF(shopeeUrl, sub1, sub2, sub3)
+ * Hàm tạo link Shopee Affiliate tự động trên Google Sheets
+ * @param {string} rawUrl Link Shopee gốc
+ * @param {string} sub1 Nguồn quảng bá (mặc định: google_sheets)
+ * @param {string} sub2 Tên chiến dịch
+ * @return Link Affiliate hoàn chỉnh
+ * @customfunction
  */
-function SHOPEE_AFF(shopeeUrl, sub1, sub2, sub3) {
-  var AFFILIATE_ID = "14354840000"; // Thay mã ID Affiliate của bạn ở đây
-  if (!shopeeUrl) return "";
+function CREATE_SHOPEE_AFF(rawUrl, sub1, sub2) {
+  if (!rawUrl || rawUrl === "") return "";
+  var affId = "17384730538";
+  var encodedUrl = encodeURIComponent(rawUrl.toString().trim());
+  var sub1Val = sub1 ? sub1.toString().trim() : "google_sheets";
+  var sub2Val = sub2 ? sub2.toString().trim() : "sheet_report";
   
-  var encodedUrl = encodeURIComponent(shopeeUrl);
-  var subIds = [];
-  if (sub1) subIds.push(sub1);
-  if (sub2) subIds.push(sub2);
-  if (sub3) subIds.push(sub3);
-  
-  var subStr = subIds.join("-");
-  var result = "https://s.shopee.vn/an_redir?origin_link=" + encodedUrl + "&affiliate_id=" + AFFILIATE_ID;
-  if (subStr) {
-    result += "&sub_id=" + subStr;
-  }
-  return result;
+  return "https://s.shopee.vn/an_redir?origin_link=" + encodedUrl + 
+         "&affiliate_id=" + affId + 
+         "&sub_id=" + sub1Val + "-" + sub2Val;
 }</code></pre>
             </div>
           </div>
         </div>
       </section>
 
-      <!-- TAB 8: TELEGRAM BOT -->
-      <section id="tab-telegram" class="tab-pane">
+      <!-- TAB 8: TELEGRAM BOT CODE -->
+      <section id="tab-telegram" class="tab-content hidden">
         <div class="card">
           <div class="card-header">
-            <i class="fa-paper-plane text-info"></i>
-            <h3>Tự Động Hóa Với Telegram Bot</h3>
+            <h3><i class="fa-paper-plane"></i> Tích Hợp Telegram Bot (Python Source Code)</h3>
+            <p class="subtitle">Bot tự động phản hồi link Affiliate ngắn khi quăng link vào khung chat.</p>
           </div>
           <div class="card-body">
-            <p>Bot Telegram giúp bạn gửi bất kỳ link Shopee nào vào khung chat, Bot sẽ tự động trả lại link Affiliate rút gọn trong 1 giây.</p>
-            
+            <p>Chạy file Python trên máy chủ hoặc máy tính cá nhân để kích hoạt Bot Telegram:</p>
             <div class="code-box-wrapper">
               <button class="btn btn-sm btn-copy-code" data-target="tg-code"><i class="fa-regular fa-copy"></i> Sao chép Mã Python Bot</button>
               <pre><code id="tg-code">import urllib.parse
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters, ContextTypes
 
-AFFILIATE_ID = "14354840000"
+AFFILIATE_ID = "17384730538"
 TELEGRAM_BOT_TOKEN = "YOUR_TELEGRAM_BOT_TOKEN_HERE"
 
 async def convert_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -539,7 +520,7 @@ if __name__ == '__main__':
     print("Bot đang hoạt động...")
     app.run_polling()</code></pre>
             </div>
-            <p class="mt-3"><i class="fa-solid fa-file-code"></i> Mã nguồn hoàn chỉnh kèm file cấu hình nằm tại thư mục: <code>telegram-bot/bot.py</code></p>
+            <p class="mt-3"><i class="fa-solid fa-file-code"></i> Mã nguồn hoàn chỉnh nằm tại: <code>telegram-bot/bot.py</code></p>
           </div>
         </div>
       </section>
@@ -553,6 +534,6 @@ if __name__ == '__main__':
     <span id="toast-msg">Đã sao chép vào bộ nhớ tạm!</span>
   </div>
 
-  <script src="js/app.js?v=4.4"></script>
+  <script src="js/app.js?v=5.0"></script>
 </body>
 </html>
