@@ -46,6 +46,7 @@ Upload-FileToFtp "$localBase\css\shop.css" "$remoteBase/css/shop.css"
 # Upload-FileToFtp "$localBase\js\products-data.js" "$remoteBase/js/products-data.js" <-- PROTECTED LIVE DATABASE
 Upload-FileToFtp "$localBase\js\shop.js" "$remoteBase/js/shop.js"
 Upload-FileToFtp "$localBase\save-products.php" "$remoteBase/save-products.php"
+Upload-FileToFtp "$localBase\get-products.php" "$remoteBase/get-products.php"
 Upload-FileToFtp "$localBase\purge.php" "$remoteBase/purge.php"
 Upload-FileToFtp "$localBase\shorten.php" "$remoteBase/shorten.php"
 Upload-FileToFtp "$localBase\r.php" "$remoteBase/r.php"

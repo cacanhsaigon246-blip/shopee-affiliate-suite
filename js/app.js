@@ -252,7 +252,7 @@ document.addEventListener('DOMContentLoaded', () => {
     adminProductTableBody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 20px; color: #888;"><i class="fa-solid fa-spinner fa-spin"></i> Đang nạp danh sách kho hàng từ shop.saigoncacanh.com...</td></tr>';
     
     try {
-      const res = await fetch(`https://shop.saigoncacanh.com/js/products-data.json?v=${Date.now()}`);
+      const res = await fetch(`https://shop.saigoncacanh.com/get-products.php?v=${Date.now()}`);
       if (res.ok) {
         adminProducts = await res.json();
       } else {
