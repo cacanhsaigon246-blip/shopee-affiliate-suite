@@ -183,6 +183,21 @@ document.addEventListener('DOMContentLoaded', () => {
       productGrid.appendChild(card);
     });
 
+    productGrid.querySelectorAll('.product-img-wrapper').forEach(wrap => {
+      if (!wrap.hasAttribute('data-lightbox-bound')) {
+        wrap.setAttribute('data-lightbox-bound', 'true');
+        wrap.addEventListener('click', (e) => {
+          const card = wrap.closest('.product-card');
+          if (card) {
+            const img = wrap.querySelector('img')?.src;
+            const title = card.querySelector('.product-title')?.textContent;
+            const buyLink = card.querySelector('.btn-buy-shopee')?.href;
+            openLightbox(img, title, buyLink);
+          }
+        });
+      }
+    });
+
     productGrid.querySelectorAll('.btn-buy-shopee').forEach(btn => {
       if (!btn.hasAttribute('data-tracked')) {
         btn.setAttribute('data-tracked', 'true');
@@ -366,6 +381,35 @@ document.addEventListener('DOMContentLoaded', () => {
     showToast('Đã mở tất cả sản phẩm trên Shopee!');
     closeCart();
   });
+
+  // Lightbox Modal Functions
+  const imageLightboxModal = document.getElementById('image-lightbox-modal');
+  const lightboxImg = document.getElementById('lightbox-img');
+  const lightboxTitle = document.getElementById('lightbox-title');
+  const lightboxBuyBtn = document.getElementById('lightbox-buy-btn');
+  const btnCloseLightbox = document.getElementById('btn-close-lightbox');
+
+  function openLightbox(imgSrc, title, buyLink) {
+    if (!imageLightboxModal) return;
+    lightboxImg.src = imgSrc || '';
+    lightboxTitle.textContent = title || '';
+    lightboxBuyBtn.href = buyLink || '#';
+    imageLightboxModal.classList.remove('hidden');
+  }
+
+  if (btnCloseLightbox) {
+    btnCloseLightbox.addEventListener('click', () => {
+      imageLightboxModal.classList.add('hidden');
+    });
+  }
+
+  if (imageLightboxModal) {
+    imageLightboxModal.addEventListener('click', (e) => {
+      if (e.target === imageLightboxModal) {
+        imageLightboxModal.classList.add('hidden');
+      }
+    });
+  }
 
   // Initial Render
   renderProducts();
