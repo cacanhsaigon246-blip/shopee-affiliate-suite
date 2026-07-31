@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-  const AFFILIATE_ID = "14354840000";
+  const AFFILIATE_ID = "17384730538";
 
   // Elements
   const productGrid = document.getElementById('product-grid');

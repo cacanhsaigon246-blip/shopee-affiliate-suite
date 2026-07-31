@@ -40,10 +40,10 @@ Ensure-FtpDirectory "$remoteBase/css"
 Ensure-FtpDirectory "$remoteBase/js"
 Ensure-FtpDirectory "$remoteBase/images"
 
-# Upload files
+# Upload files (NOTE: products-data.js is EXCLUDED to protect live product database on Hostinger!)
 Upload-FileToFtp "$localBase\index.html" "$remoteBase/index.html"
 Upload-FileToFtp "$localBase\css\shop.css" "$remoteBase/css/shop.css"
-Upload-FileToFtp "$localBase\js\products-data.js" "$remoteBase/js/products-data.js"
+# Upload-FileToFtp "$localBase\js\products-data.js" "$remoteBase/js/products-data.js" <-- PROTECTED LIVE DATABASE
 Upload-FileToFtp "$localBase\js\shop.js" "$remoteBase/js/shop.js"
 Upload-FileToFtp "$localBase\save-products.php" "$remoteBase/save-products.php"
 Upload-FileToFtp "$localBase\shorten.php" "$remoteBase/shorten.php"
