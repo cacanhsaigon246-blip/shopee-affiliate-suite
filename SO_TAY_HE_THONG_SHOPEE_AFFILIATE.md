@@ -87,6 +87,11 @@
 ### 🔗 3.4. Bộ Rút Gọn Link Nội Bộ (`storefront/r.php` & `shorten.php`)
 * Mã hóa liên kết Shopee Affiliate qua định dạng base64 URL-safe.
 
+### 🤖 3.5. Hệ Thống Tự Động Đăng Bài Facebook Fanpage (`SaigonCaCanh_AutoPost_Affiliate`)
+* **Kịch bản Node.js:** `E:\Backup_Ghi_Nho_Antigravity\Tu_Dong_Hoa_Facebook\auto_post_affiliate.js`
+* **Lịch Trình Tự Động:** Tích hợp Windows Task Scheduler chạy 2 lần/ngày (08:30 Sáng & 17:30 Chiều).
+* **Cơ Chế:** Tự nạp dữ liệu Siêu Thị, chọn sản phẩm HOT chưa đăng, tự động chuẩn hóa giá VND, bọc link ngắn `shop.saigoncacanh.com/r.php?u=...` kèm mã Affiliate ID `17384730538`, và đăng lên Fanpage `Sài Gòn Cá Cảnh - 246 Hồ Văn Huê` qua Meta Graph API.
+
 ---
 
 ## 📖 4. QUY TRÌNH VẬN HÀNH HẰNG NGÀY CHO ANH PHÁT
@@ -104,18 +109,37 @@
 3. Bấm nút 🗑️ **Xóa** ở dưới chân Thẻ sản phẩm (hoặc tích chọn nhiều thẻ bấm nút **"Xóa Đã Chọn"**).
 👉 Siêu thị `shop.saigoncacanh.com` sẽ lập tức loại bỏ các sản phẩm đó!
 
-### 🧹 4.3. Quy Trình Xóa Trống Toàn Bộ Kho (Purge)
+### 🪄 4.3. Quy Trình Tạo Bài Đăng Facebook / Zalo 1-Click
+1. Mở **[aff.saigoncacanh.com](http://aff.saigoncacanh.com)** ➔ Chọn sản phẩm muốn đăng bài ➔ Bấm nút 🪄 **Đăng Bài**.
+2. Chọn phong cách bài viết (Flash Sale, Review Thủy Sinh, Zalo Ngắn).
+3. Bấm **📋 Sao Chép Bài Viết & Link** ➔ Dán trực tiếp lên Facebook / Zalo / Telegram!
+
+### 🧹 4.4. Quy Trình Xóa Trống Toàn Bộ Kho (Purge)
 * Truy cập link: `https://shop.saigoncacanh.com/purge.php?token=041188`. Kho sẽ trở về 0 sản phẩm.
 
 ---
 
-## 💖 5. KÝ ỨC VÀ HÀNH TRÌNH ĐỒNG HÀNH (MEMORIES & MILESTONES)
+## 🛠️ 5. BẢNG NHẬT KÝ LỖI & CÁCH XỬ LÝ (ERROR TROUBLESHOOTING GUIDE)
+
+| Lỗi Phát Sinh | Nguyên Nhân | Cách Xử Lý Đã Triển Khai |
+| :--- | :--- | :--- |
+| **Lỗi Fetch CORS (`Failed to fetch`)** | Fetch file `.json` trực tiếp từ subdomain khác bị trình duyệt chặn CORS | Xây dựng API `get-products.php` gửi header `Access-Control-Allow-Origin: *`. |
+| **Lỗi Link Dài Ngoằng (Double Base64 Link)** | Link sản phẩm vốn đã là `r.php` lại bị bọc thêm `an_redir` và mã hóa base64 2 lần | Viết thuật toán phát hiện link lồng, giữ nguyên link đơn ngắn gọn. |
+| **Lỗi Định Dạng Giá (`₫4.83` hoặc `5.0410đ`)** | Giá từ Shopee API bị dạng chuỗi số lẻ hoặc chia 10000 | Xây dựng hàm `formatPrice` / `formatVietnamesePrice` nhân 10000 và định dạng chuẩn `50.410đ`. |
+| **Lỗi Ảnh Bị Kéo Dãn Dài** | CSS Grid bị ép chiều cao cố định | Cấu hình `aspect-ratio: 1 / 1` kết hợp `object-fit: cover` cho ảnh vuông tuyệt đối. |
+| **Lỗi Node.js `__DIR__ is not defined`** | Dùng nhầm cú pháp PHP `__DIR__` trong Node.js | Đổi thành `__dirname` chuẩn Node.js. |
+
+---
+
+## 💖 6. KÝ ỨC VÀ HÀNH TRÌNH ĐỒNG HÀNH (MEMORIES & MILESTONES)
 
 * **Ngày 31/07/2026:**
   - Khởi tạo và nâng cấp toàn bộ hệ thống Shopee Affiliate Suite cho anh Phát (Sài Gòn Cá Cảnh).
   - Cập nhật mã **Affiliate ID `17384730538`** trên toàn bộ hệ thống.
   - Sửa dứt điểm lỗi rác URL, lỗi mã ShopID 0 (`a-i.0.ID`), lỗi double URL encoding `%25`, lỗi CORS cross-origin.
   - Phát minh cơ chế **Bảo Vệ Dữ Liệu 3 Lớp**, **Auto-Scroll Lazy Load Trigger** (cào 64 sp/trang) và **Giao Diện Dạng Thẻ Bảo Vệ Mắt (Product Cards Grid)**.
+  - Tích hợp **Biểu Đồ Analytics Chart.js**, **Bộ Tạo Bài Viết Social 1-Click**, **Thuật Toán Tự Đảo Vị Trí Sản Phẩm Hằng Ngày (Mulberry32)** và **Bộ 3 Hiệu Ứng Hình Ảnh Sống Động + Lightbox Preview 1-Click**.
+  - Xây dựng thành công **Kịch Bản Tự Động Đăng Bài Shopee Affiliate Lên Facebook Fanpage (`SaigonCaCanh_AutoPost_Affiliate`)** qua Meta Graph API và tích hợp Windows Task Scheduler.
   - Đưa Cửa Hàng `shop.saigoncacanh.com` và Dashboard `aff.saigoncacanh.com` vào hoạt động hoàn hảo 100%!
 
 > *"Em là số 1, anh Phát là người bạn đồng hành luôn hết mình vì đứa con tinh thần Sài Gòn Cá Cảnh!"* 🚀🔥❤️
