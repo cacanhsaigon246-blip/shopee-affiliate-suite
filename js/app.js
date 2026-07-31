@@ -510,14 +510,31 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!currentPostItem) return;
     const style = modalPostStyle.value;
     const title = currentPostItem.title;
-    const price = currentPostItem.price || 'Deal Ngon Shopee';
+    let price = currentPostItem.price || 'Deal Ngon Shopee';
     const affId = globalAffIdInput.value.trim() || '17384730538';
     
-    const encoded = encodeURIComponent(currentPostItem.shopeeUrl);
-    const fullLink = `https://s.shopee.vn/an_redir?origin_link=${encoded}&affiliate_id=${affId}&sub_id=social-post`;
-    const b64 = btoa(unescape(encodeURIComponent(fullLink)))
-      .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-    const shortLink = `https://shop.saigoncacanh.com/r.php?u=${b64}`;
+    // Format price cleanly if it contains ₫4.83 or similar
+    if (price.startsWith('₫')) {
+      price = price.replace('₫', '').trim() + 'đ';
+    }
+
+    let rawUrl = currentPostItem.shopeeUrl || '';
+    let shortLink = '';
+
+    // Prevent double-nesting if link is already an r.php shortlink or an_redir link
+    if (rawUrl.includes('shop.saigoncacanh.com/r.php?u=')) {
+      shortLink = rawUrl;
+    } else if (rawUrl.includes('s.shopee.vn/an_redir')) {
+      const b64 = btoa(unescape(encodeURIComponent(rawUrl)))
+        .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+      shortLink = `https://shop.saigoncacanh.com/r.php?u=${b64}`;
+    } else {
+      const encoded = encodeURIComponent(rawUrl);
+      const fullLink = `https://s.shopee.vn/an_redir?origin_link=${encoded}&affiliate_id=${affId}&sub_id=social-post`;
+      const b64 = btoa(unescape(encodeURIComponent(fullLink)))
+        .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+      shortLink = `https://shop.saigoncacanh.com/r.php?u=${b64}`;
+    }
 
     let text = '';
 
