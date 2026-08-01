@@ -145,6 +145,7 @@
 | **Lỗi Định Dạng Giá (`₫4.83` hoặc `5.0410đ`)** | Giá từ Shopee API bị dạng chuỗi số lẻ hoặc chia 10000 | Xây dựng hàm `formatPrice` / `formatVietnamesePrice` nhân 10000 và định dạng chuẩn `50.410đ`. |
 | **Lỗi Ảnh Bị Kéo Dãn Dài** | CSS Grid bị ép chiều cao cố định | Cấu hình `aspect-ratio: 1 / 1` kết hợp `object-fit: cover` cho ảnh vuông tuyệt đối. |
 | **Lỗi Node.js `__DIR__ is not defined`** | Dùng nhầm cú pháp PHP `__DIR__` trong Node.js | Đổi thành `__dirname` chuẩn Node.js. |
+| **Lỗi Auto-Post FB Ngừng Chạy (`EBUSY: resource busy or locked auto_post_affiliate.log`)** | File `.bat` lồng lệnh `>> auto_post_affiliate.log` làm Windows khóa file, khiến `fs.appendFileSync` trong Node.js bị đụng độ | 1. Bỏ redirect `>>` trong `auto_post_affiliate_daily.bat`.<br>2. Bọc `try-catch` quanh `fs.appendFileSync` trong `auto_post_affiliate.js`. |
 
 ---
 
