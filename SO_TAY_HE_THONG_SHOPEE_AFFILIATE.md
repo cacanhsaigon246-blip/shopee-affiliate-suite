@@ -89,7 +89,7 @@
 
 ### 🤖 3.5. Hệ Thống Tự Động Đăng Bài Facebook Fanpage (`SaigonCaCanh_AutoPost_Affiliate`)
 * **Kịch bản Node.js:** `E:\Backup_Ghi_Nho_Antigravity\Tu_Dong_Hoa_Facebook\auto_post_affiliate.js`
-* **Tần Suất Đăng:** **16 Bài / Ngày** (Lịch trình mỗi 1 tiếng/lần từ 07:00 Sáng đến 22:00 Đêm).
+* **Tần Suất Đăng:** **30 Bài / Ngày** (Lịch trình mỗi 30 phút/lần từ 07:00 Sáng đến 22:00 Đêm).
 * **Cấu Hình Chạy Bù (`StartWhenAvailable`):** Nếu máy tính bật trễ, Windows Task Scheduler tự động đăng bù ngay khi mở máy!
 * **Bộ 5 Phong Cách Bài Đăng SEO Google (`buildCaption`):**
   1. 🔥 *Flash Sale & Deal Hot Chớp Nhoáng*
